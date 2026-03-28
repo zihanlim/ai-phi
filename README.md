@@ -13,6 +13,8 @@ A web application for engaging in intellectual dialogue with historical and cont
 - **Dialogue Interface** — Engage in deep, one-on-one conversations with individual philosophers
 - **Philosopher Dossiers** — Explore biographies, major works, and key ideas from diverse traditions
 - **Multi-Tradition Coverage** — Western, Eastern, African, Middle Eastern, Latin American, and Indigenous philosophies
+- **Conversation Archive** — Save and revisit your philosophical dialogues
+- **Multi-AI Provider Support** — Works with OpenAI or Anthropic APIs
 
 ## Tech Stack
 
@@ -38,34 +40,51 @@ The neon-socratic design language features:
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL database (Supabase or local)
+- PostgreSQL database (Supabase free tier or local)
 - OpenAI or Anthropic API key
 
-### Environment Variables
+### 1. Clone the Repository
 
-Create a `.env` file:
+```bash
+git clone https://github.com/zihanlim/ai-phi.git
+cd ai-phi
+```
+
+### 2. Set Up Supabase (Free Tier Works)
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to Settings > Database to find your connection string
+3. Enable "Use connection pooling" and set Pool mode to "Transaction"
+4. Copy the connection string in this format:
+   ```
+   postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+   ```
+
+### 3. Configure Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your credentials:
 
 ```env
-# Database
-DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
+# Database (from Supabase)
+DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
 
-# Supabase (for auth - optional)
-NEXT_PUBLIC_SUPABASE_URL="https://[PROJECT-REF].supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY="your-publishable-key"
-
-# AI Providers
+# AI Providers (at least one required)
 OPENAI_API_KEY="sk-..."
 # or
 ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-### Installation
+### 4. Install and Initialize
 
 ```bash
 # Install dependencies
 npm install
 
-# Set up database
+# Push database schema
 npm run db:push
 
 # Seed philosophers
@@ -86,22 +105,22 @@ src/
 │   ├── debate/            # Debate Chamber
 │   ├── dialogue/          # Dialogue Interface
 │   ├── dossier/           # Philosopher Dossiers
-│   │   └── [id]/         # Individual dossier pages
+│   │   └── [id]/          # Individual dossier pages
 │   ├── archive/           # Saved conversations
 │   ├── settings/          # App settings
 │   └── api/               # API routes
-│       ├── chat/         # AI chat endpoint
-│       ├── conversations/ # Conversation CRUD
-│       └── philosophers/  # Philosopher data
+│       ├── chat/          # AI chat endpoint
+│       ├── conversations/  # Conversation CRUD
+│       └── philosophers/   # Philosopher data
 ├── components/            # Reusable UI components
 │   ├── Navigation.tsx     # Bottom navigation bar
 │   ├── PhilosopherCard.tsx
 │   ├── ChatInterface.tsx
 │   └── ComparisonView.tsx
 └── lib/                   # Utilities
-    ├── ai.ts             # OpenAI/Anthropic clients
-    ├── db.ts             # Prisma client
-    └── supabase/         # Supabase helpers
+    ├── ai.ts              # OpenAI/Anthropic clients
+    ├── db.ts              # Prisma client
+    └── supabase/          # Supabase helpers
 prototypes/                # Original HTML prototypes (reference)
 ```
 
@@ -122,21 +141,47 @@ prototypes/                # Original HTML prototypes (reference)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/chat` | POST | Send message, get AI responses from philosophers |
-| `/api/conversations` | GET, POST | List or create conversations |
+| `/api/chat` | GET, POST | Fetch messages or send new chat |
+| `/api/conversations` | GET, POST, DELETE | List, create, or delete conversations |
 | `/api/philosophers` | GET | List all philosophers |
 
 ## Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
-npm run db:push  # Push Prisma schema to database
-npm run db:seed  # Seed database with philosophers
+npm run dev       # Start development server
+npm run build     # Build for production
+npm run start     # Start production server
+npm run lint      # Run ESLint
+npm run db:push   # Push Prisma schema to database
+npm run db:seed   # Seed database with philosophers
 npm run db:studio # Open Prisma Studio
 ```
+
+## Roadmap
+
+### Planned Features
+
+- [ ] **User Authentication** — Sign up/login via Supabase Auth
+- [ ] **User Profiles** — Save preferences and conversation history per user
+- [ ] **More Philosophers** — Expand to 20+ philosophers across all traditions
+  - Eastern: Sun Tzu, Mencius, Zhuangzi, Shankara, Nagarjuna
+  - Western: Plato, Kant, Kierkegaard, Sartre, Hannah Arendt
+  - African: Cheikh Anta Diop, Kwame Nkrumah
+  - Middle Eastern: Avicenna, Al-Ghazali, Averroes
+  - Latin American: Enrique Dussel, Rodolfo Kusch
+  - Indigenous: Chief Seattle, Vine Deloria Jr.
+- [ ] **Conversation Export** — Export dialogues as PDF or Markdown
+- [ ] **Philosopher Debate Mode** — AI-driven debates between selected philosophers
+- [ ] **Mobile App** — React Native companion app
+- [ ] **Rate Limiting** — Protect API endpoints from abuse
+- [ ] **Caching** — Redis caching for philosopher data
+- [ ] **Analytics Dashboard** — Track usage and popular philosophers
+
+### Known Limitations
+
+- Currently single-user mode (no auth)
+- Requires manual .env setup
+- API responses depend on AI provider quality/quotas
 
 ## License
 
