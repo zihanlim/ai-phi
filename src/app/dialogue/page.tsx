@@ -1,105 +1,192 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { ChatInterface } from "@/components/ChatInterface";
+import { Navigation } from "@/components/Navigation";
+
+interface Philosopher {
+  id: string;
+  name: string;
+  era: string;
+  tradition: string;
+  bio: string;
+  works: string[];
+  ideas: string[];
+  imageUrl?: string;
+}
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp?: string;
+  philosopherName?: string;
 }
 
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content:
-      "You ask of the void. I tell you: God is dead. God remains dead. And we have killed him. How shall we comfort ourselves, the murderers of all murderers? What was holiest and mightiest of all that the world has yet owned has bled to death under our knives: who will wipe this blood off us?",
-    timestamp: "Analytical Output_01",
-  },
-  {
-    id: "2",
-    role: "user",
-    content:
-      "If the old foundations are gone, what replaces the structure of morality? Are we not destined for a descent into nihilism?",
-    timestamp: "User Inquiry",
-  },
-  {
-    id: "3",
-    role: "assistant",
-    content:
-      "Nihilism is but a transitional stage. The &quot;Higher Man&quot; does not mourn the loss of the old sun; he becomes his own light. We must create our own values. He who has a why to live can bear almost any how.",
-    timestamp: "Analytical Output_02",
-  },
-];
-
-const quickLogicTags = [
-  "Historical Context",
-  "Logical Fallacy Check",
-  "Socratic Counter",
-  "Paradox Identification",
-];
-
-export default function DialoguePage() {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [inputValue, setInputValue] = useState("");
+function DialogueContent() {
+  const searchParams = useSearchParams();
+  const [philosophers, setPhilosophers] = useState<Philosopher[]>([]);
+  const [selectedPhilosopher, setSelectedPhilosopher] = useState<Philosopher | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [contextAnalyzerOn, setContextAnalyzerOn] = useState(true);
+  const [conversationId, setConversationId] = useState<string>("");
+  const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
+  const [showPhilosopherSelector, setShowPhilosopherSelector] = useState(true);
 
-  const philosopherName = "Friedrich Nietzsche";
-  const conversationTopic = "THE DEATH OF GOD.";
-  const sessionInfo = "Existential Synthesis";
-  const sourceText = "Thus Spoke Zarathustra (1883)";
+  // Handle pre-selected philosopher from query param
+  useEffect(() => {
+    async function initPhilosopher() {
+      const philosopherId = searchParams.get("philosopher");
+      if (philosopherId) {
+        // Fetch philosophers to find the selected one
+        try {
+          const res = await fetch("/api/philosophers");
+          if (res.ok) {
+            const data = await res.json();
+            const philosopher = data.find((p: Philosopher) => p.id === philosopherId);
+            if (philosopher) {
+              setSelectedPhilosopher(philosopher);
+              setShowPhilosopherSelector(false);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch philosopher:", error);
+        }
+      }
+      setLoadingPhilosophers(false);
+    }
+    initPhilosopher();
+  }, [searchParams]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  // Fetch philosophers
+  useEffect(() => {
+    async function fetchPhilosophers() {
+      try {
+        const res = await fetch("/api/philosophers");
+        if (res.ok) {
+          const data = await res.json();
+          setPhilosophers(data);
+        }
+      } catch {
+        console.error("Failed to fetch philosophers");
+      } finally {
+        setLoadingPhilosophers(false);
+      }
+    }
+    fetchPhilosophers();
+  }, []);
 
+  const selectPhilosopher = (philosopher: Philosopher) => {
+    setSelectedPhilosopher(philosopher);
+    setShowPhilosopherSelector(false);
+    setMessages([]);
+    setConversationId("");
+  };
+
+  const handleSendMessage = async (content: string) => {
+    if (!selectedPhilosopher || !content.trim()) return;
+
+    // Add user message
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: inputValue,
+      content: content,
       timestamp: "User Inquiry",
     };
-
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const assistantMessage: Message = {
-        id: `assistant-${Date.now()}`,
+    try {
+      // Create or use existing conversation
+      const currentConversationId = conversationId || `conv-${Date.now()}`;
+      setConversationId(currentConversationId);
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          conversationId: currentConversationId,
+          philosopherIds: [selectedPhilosopher.id],
+          question: content,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Add assistant response
+        const assistantMessage: Message = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: data.responses?.[0]?.response || "I apologize, but I could not generate a response. Please try again.",
+          timestamp: `Response from ${selectedPhilosopher.name}`,
+          philosopherName: selectedPhilosopher.name,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        // Error response
+        const errorMessage: Message = {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content: "I apologize, but I could not generate a response at this time. Please try again.",
+          timestamp: `Error`,
+          philosopherName: selectedPhilosopher.name,
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      const errorMessage: Message = {
+        id: `error-${Date.now()}`,
         role: "assistant",
-        content:
-          "The will to power creates its own values. What appears as chaos is merely the overflow of life seeking new forms of expression. Embrace the abyss of meaninglessness and forge your own meaning.",
-        timestamp: "Analytical Output",
+        content: "Network error. Please check your connection and try again.",
+        timestamp: `Error`,
+        philosopherName: selectedPhilosopher.name,
       };
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
+  };
+
+  const handleBackToSelector = () => {
+    setShowPhilosopherSelector(true);
+    setSelectedPhilosopher(null);
+    setMessages([]);
+    setConversationId("");
   };
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 border-b border-[#27272a] bg-[#09090b]">
+      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a]">
         <div className="flex justify-between items-center px-6 h-16 w-full">
           <div className="flex items-center gap-4">
-            <button className="text-primary active:scale-95 transition-transform">
-              <span className="material-symbols-outlined">menu</span>
-            </button>
+            {selectedPhilosopher && (
+              <button
+                onClick={handleBackToSelector}
+                className="text-primary active:scale-95 transition-transform"
+              >
+                <span className="material-symbols-outlined">arrow_back</span>
+              </button>
+            )}
             <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl text-primary">
               DIGITAL AGORA
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <span className="font-label text-[10px] text-zinc-500 uppercase tracking-widest">
-                Active Logic Node
-              </span>
-              <span className="font-headline text-sm text-primary uppercase">
-                {philosopherName}
-              </span>
-            </div>
+            {selectedPhilosopher && (
+              <div className="flex flex-col items-end">
+                <span className="font-label text-[10px] text-zinc-500 uppercase tracking-widest">
+                  Active Logic Node
+                </span>
+                <span className="font-headline text-sm text-primary uppercase">
+                  {selectedPhilosopher.name}
+                </span>
+              </div>
+            )}
             <button className="text-zinc-400 hover:text-primary transition-colors duration-200 active:scale-95 transition-transform">
               <span className="material-symbols-outlined">notifications</span>
             </button>
@@ -107,174 +194,237 @@ export default function DialoguePage() {
         </div>
       </header>
 
-      <main className="pt-16 pb-40 min-h-screen max-w-4xl mx-auto px-6">
-        <div className="py-12 flex flex-col items-start gap-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high border border-outline-variant/20 rounded-sm">
-            <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,255,163,0.5)]" />
-            <span className="font-label text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">
-              Session: {sessionInfo}
-            </span>
-          </div>
-          <h2 className="font-headline text-5xl md:text-7xl leading-none text-on-surface tracking-tighter">
-            {conversationTopic}
-          </h2>
-          <p className="font-label text-sm text-primary mt-2 opacity-80 uppercase tracking-widest">
-            Synthesizing: {sourceText}
-          </p>
-        </div>
-
-        <div className="space-y-12">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex flex-col gap-3 ${
-                message.role === "user" ? "items-end max-w-[80%] ml-auto" : "items-start max-w-[85%]"
-              }`}
-            >
-              <div className="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">
-                {message.timestamp}
+      <main className="pt-16 min-h-screen flex flex-col">
+        {/* Philosopher Selector View */}
+        {showPhilosopherSelector && (
+          <div className="flex-1 pb-40">
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="material-symbols-outlined text-primary">person_search</span>
+                <h2 className="font-headline text-2xl uppercase tracking-widest">
+                  Select a Philosopher
+                </h2>
               </div>
-              {message.role === "assistant" ? (
-                <div className="bg-[#18181b] p-6 border-l-2 border-primary rounded-sm">
-                  <p
-                    className="text-lg leading-relaxed text-on-surface font-body"
-                    dangerouslySetInnerHTML={{ __html: message.content }}
-                  />
+
+              {loadingPhilosophers ? (
+                <div className="flex gap-1 items-center justify-center h-64">
+                  <span className="font-label text-primary text-xl blinking-cursor">_</span>
+                  <span className="font-label text-primary text-xl opacity-40">_</span>
+                  <span className="font-label text-primary text-xl opacity-20">_</span>
                 </div>
               ) : (
-                <div className="border border-[#27272a] p-6 bg-transparent rounded-sm backdrop-blur-sm">
-                  <p className="text-lg leading-relaxed text-zinc-300">{message.content}</p>
-                </div>
-              )}
-              {message.role === "assistant" && (
-                <div className="flex gap-4 px-1">
-                  <button className="font-label text-[10px] text-zinc-600 hover:text-primary transition-colors uppercase">
-                    Cite Logic
-                  </button>
-                  <button className="font-label text-[10px] text-zinc-600 hover:text-primary transition-colors uppercase">
-                    Branch Thought
-                  </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {philosophers.map((philosopher) => (
+                    <button
+                      key={philosopher.id}
+                      onClick={() => selectPhilosopher(philosopher)}
+                      className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left"
+                    >
+                      <div className="h-32 relative overflow-hidden">
+                        {philosopher.imageUrl ? (
+                          <img
+                            src={philosopher.imageUrl}
+                            alt={philosopher.name}
+                            className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                            <span className="font-headline text-5xl text-zinc-600">
+                              {philosopher.name.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent" />
+                      </div>
+                      <div className="p-4">
+                        <p className="font-headline text-lg uppercase tracking-tight">
+                          {philosopher.name}
+                        </p>
+                        <p className="font-label text-[9px] text-zinc-500">
+                          {philosopher.era} · {philosopher.tradition}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
-          ))}
+          </div>
+        )}
 
-          {isLoading && (
-            <div className="flex flex-col items-start gap-3">
-              <div className="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">
-                Synthesizing...
-              </div>
-              <div className="flex gap-1 items-center px-1">
-                <span className="font-label text-primary text-xl blinking-cursor">_</span>
-                <span className="font-label text-primary text-xl opacity-40">_</span>
-                <span className="font-label text-primary text-xl opacity-20">_</span>
+        {/* Chat View */}
+        {!showPhilosopherSelector && selectedPhilosopher && (
+          <>
+            {/* Philosopher Context Header */}
+            <div className="p-6 border-b border-outline-variant/20">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+                  {selectedPhilosopher.imageUrl ? (
+                    <img
+                      src={selectedPhilosopher.imageUrl}
+                      alt={selectedPhilosopher.name}
+                      className="w-full h-full object-cover grayscale opacity-70"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                      <span className="font-headline text-3xl text-zinc-600">
+                        {selectedPhilosopher.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(0,255,163,0.5)]" />
+                    <span className="font-label text-[10px] text-primary uppercase tracking-widest">
+                      Active Session
+                    </span>
+                  </div>
+                  <h2 className="font-headline text-2xl mt-1">
+                    {selectedPhilosopher.name}
+                  </h2>
+                  <p className="font-label text-[10px] text-zinc-500">
+                    {selectedPhilosopher.era} · {selectedPhilosopher.tradition}
+                  </p>
+                </div>
+                <Link
+                  href={`/debate?philosopher=${selectedPhilosopher.id}`}
+                  className="px-4 py-2 bg-surface-container border border-outline-variant/30 rounded-sm font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
+                >
+                  Add to Debate
+                </Link>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto pb-40">
+              {messages.length === 0 && (
+                <div className="p-6 text-center">
+                  <span className="material-symbols-outlined text-6xl text-zinc-600 mb-4 block">
+                    chat
+                  </span>
+                  <h3 className="font-headline text-xl text-zinc-400 mb-2">
+                    Begin Your Dialogue
+                  </h3>
+                  <p className="text-on-surface-variant text-sm max-w-md mx-auto">
+                    You are now conversing with {selectedPhilosopher.name}. 
+                    Ask questions, explore ideas, and engage with their philosophical perspective.
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-6 p-6">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex flex-col gap-2 ${
+                      message.role === "user"
+                        ? "items-end max-w-[80%] ml-auto"
+                        : "items-start max-w-[85%]"
+                    }`}
+                  >
+                    {message.timestamp && (
+                      <div className="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">
+                        {message.timestamp}
+                      </div>
+                    )}
+                    {message.role === "assistant" ? (
+                      <div className="bg-surface-container p-6 border-l-2 border-primary rounded-sm">
+                        <p className="text-lg leading-relaxed text-on-surface font-body whitespace-pre-wrap">
+                          {message.content}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="border border-outline-variant/30 p-6 bg-surface-container-low rounded-sm">
+                        <p className="text-lg leading-relaxed text-zinc-300 whitespace-pre-wrap">
+                          {message.content}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {isLoading && (
+                  <div className="flex flex-col items-start gap-2">
+                    <div className="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">
+                      {selectedPhilosopher.name} is thinking...
+                    </div>
+                    <div className="flex gap-1 items-center px-1">
+                      <span className="font-label text-primary text-xl blinking-cursor">_</span>
+                      <span className="font-label text-primary text-xl opacity-40">_</span>
+                      <span className="font-label text-primary text-xl opacity-20">_</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Input Area */}
+            <section className="fixed bottom-20 left-0 w-full z-40 bg-surface/95 backdrop-blur-xl border-t border-outline-variant">
+              <div className="max-w-4xl mx-auto px-6 pt-4 pb-6">
+                <div className="relative bg-surface-container-lowest border-b border-primary flex items-end p-2 transition-all focus-within:bg-surface-container">
+                  <textarea
+                    value=""
+                    onChange={() => {}}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                      }
+                    }}
+                    placeholder={`Message ${selectedPhilosopher.name}...`}
+                    rows={1}
+                    className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body resize-none py-3 px-4 placeholder:text-zinc-600 placeholder:font-label placeholder:text-xs placeholder:tracking-widest"
+                    disabled={isLoading}
+                    id="dialogue-input"
+                  />
+                  <button
+                    onClick={() => {
+                      const input = document.getElementById("dialogue-input") as HTMLTextAreaElement;
+                      if (input && input.value.trim()) {
+                        handleSendMessage(input.value);
+                        input.value = "";
+                      }
+                    }}
+                    disabled={isLoading}
+                    className={`h-10 w-10 flex items-center justify-center rounded-sm transition-all active:scale-90 ${
+                      isLoading
+                        ? "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                        : "bg-primary text-surface-container-lowest hover:shadow-[0_0_15px_rgba(0,255,163,0.4)]"
+                    }`}
+                  >
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      send
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </section>
+          </>
+        )}
       </main>
 
-      <section className="fixed bottom-0 left-0 w-full z-50 bg-[#0e0e10]/95 backdrop-blur-2xl border-t border-[#27272a]">
-        <div className="max-w-4xl mx-auto px-6 pt-4 pb-8">
-          <div
-            className="flex items-center gap-2 mb-4 group cursor-pointer"
-            onClick={() => setContextAnalyzerOn(!contextAnalyzerOn)}
-          >
-            <div
-              className={`w-8 h-4 rounded-full relative flex items-center px-1 border transition-all ${
-                contextAnalyzerOn
-                  ? "bg-primary/20 border-primary/30"
-                  : "bg-surface-container border-outline-variant"
-              }`}
-            >
-              <div
-                className={`w-2 h-2 rounded-full transition-all ${
-                  contextAnalyzerOn
-                    ? "bg-primary shadow-[0_0_8px_#00ffa3] translate-x-4"
-                    : "bg-zinc-500"
-                }`}
-              />
-            </div>
-            <span
-              className={`font-label text-[10px] uppercase tracking-[0.2em] group-hover:drop-shadow-[0_0_4px_rgba(0,255,163,0.5)] transition-all ${
-                contextAnalyzerOn ? "text-primary" : "text-zinc-500"
-              }`}
-            >
-              CONTEXT ANALYZER: {contextAnalyzerOn ? "ON" : "OFF"}
-            </span>
-          </div>
+      <Navigation />
+    </>
+  );
+}
 
-          <div className="relative bg-surface-container-lowest border-b border-primary flex items-end p-2 transition-all focus-within:bg-surface-container">
-            <button className="p-3 text-zinc-500 hover:text-on-surface transition-colors active:scale-90">
-              <span className="material-symbols-outlined">mic</span>
-            </button>
-            <textarea
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="CHALLENGE THE SUPPOSED TRUTH..."
-              rows={1}
-              className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body resize-none py-3 px-2 placeholder:text-zinc-600 placeholder:font-label placeholder:text-xs placeholder:tracking-widest"
-            />
-            <div className="flex items-center gap-2 p-1">
-              <button className="p-3 text-zinc-500 hover:text-on-surface transition-colors active:scale-90">
-                <span className="material-symbols-outlined">attach_file</span>
-              </button>
-              <button
-                onClick={handleSend}
-                className="bg-primary text-black h-10 w-10 flex items-center justify-center rounded-sm hover:shadow-[0_0_15px_rgba(0,255,163,0.4)] transition-all active:scale-90"
-              >
-                <span
-                  className="material-symbols-outlined"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  send
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="flex gap-3 mt-4 overflow-x-auto pb-2 hide-scrollbar">
-            {quickLogicTags.map((tag) => (
-              <button
-                key={tag}
-                className="whitespace-nowrap font-label text-[9px] text-zinc-500 border border-outline-variant/30 px-3 py-1 rounded-sm hover:border-primary hover:text-on-surface transition-all uppercase tracking-widest"
-              >
-                {tag}
-              </button>
-            ))}
+export default function DialoguePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface flex items-center justify-center">
+          <div className="flex gap-1 items-center">
+            <span className="font-label text-primary text-xl blinking-cursor">_</span>
+            <span className="font-label text-primary text-xl opacity-40">_</span>
+            <span className="font-label text-primary text-xl opacity-20">_</span>
           </div>
         </div>
-      </section>
-
-      <nav className="fixed bottom-0 left-0 w-full h-20 bg-surface/80 backdrop-blur-xl border-t border-outline-variant flex justify-around items-center px-4 pb-4 z-40 md:hidden">
-        <Link
-          href="/"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">grid_view</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Hub</span>
-        </Link>
-        <Link
-          href="/archive"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">history_edu</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Archive</span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Settings</span>
-        </Link>
-      </nav>
-    </>
+      }
+    >
+      <DialogueContent />
+    </Suspense>
   );
 }
