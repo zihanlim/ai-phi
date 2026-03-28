@@ -19,17 +19,17 @@ model User {
 }
 
 model Philosopher {
-  id          String   @id @default(cuid())
-  name        String
-  era         String
-  tradition   String
-  bio         String
-  works       String[]
-  ideas       String[]
+  id           String @id
+  name         String
+  era          String
+  tradition    String
+  bio          String
+  works        String[]
+  ideas        String[]
   systemPrompt String
-  imageUrl    String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  imageUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   conversationParticipants ConversationParticipant[]
   collectionItems          CollectionItem[]
