@@ -86,19 +86,19 @@ function DebateContent() {
         },
         body: JSON.stringify({
           philosopherIds: selectedPhilosophers,
-          question: question,
+          message: question,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
         // Transform API response to ComparisonMessage format
-        const comparisonMessages: ComparisonMessage[] = data.responses.map(
+        const comparisonMessages: ComparisonMessage[] = data.results.map(
           (response: { philosopherId: string; philosopherName: string; response: string }, idx: number) => ({
             id: `msg-${idx}`,
             philosopherId: response.philosopherId,
-            philosopherName: response.philosopherName,
-            content: response.response,
+            philosopherName: result.philosopherName,
+            content: result.response,
           })
         );
         setMessages(comparisonMessages);
