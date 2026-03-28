@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital Agora - Dialogue Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;family=Plus+Jakarta+Sans:wght@400;600&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#fd4e4d",
+              "on-primary-container": "#005c38",
+              "inverse-on-surface": "#565457",
+              "secondary-fixed": "#bfd1ff",
+              "on-primary-fixed": "#00472a",
+              "error-container": "#9f0519",
+              "secondary-container": "#005ac2",
+              "surface-variant": "#262528",
+              "surface": "#0e0e10",
+              "on-secondary-fixed-variant": "#004da8",
+              "surface-container-low": "#131315",
+              "primary": "#b1ffce",
+              "on-secondary": "#001e4a",
+              "surface-dim": "#0e0e10",
+              "primary-fixed": "#00ffa3",
+              "on-surface": "#f9f5f8",
+              "outline-variant": "#48474a",
+              "on-surface-variant": "#adaaad",
+              "primary-dim": "#00ef99",
+              "inverse-primary": "#006d43",
+              "surface-container-highest": "#262528",
+              "on-tertiary-fixed": "#3a0003",
+              "tertiary-dim": "#ff716a",
+              "on-primary-fixed-variant": "#00673f",
+              "outline": "#767577",
+              "on-error-container": "#ffa8a3",
+              "on-background": "#f9f5f8",
+              "primary-container": "#00ffa3",
+              "inverse-surface": "#fcf8fb",
+              "secondary-fixed-dim": "#a9c4ff",
+              "error-dim": "#d7383b",
+              "on-primary": "#00663e",
+              "tertiary-fixed-dim": "#ff7b74",
+              "secondary-dim": "#699cff",
+              "tertiary-fixed": "#ff928b",
+              "surface-bright": "#2c2c2f",
+              "on-tertiary-fixed-variant": "#79000e",
+              "background": "#0e0e10",
+              "on-error": "#490006",
+              "on-secondary-container": "#f7f7ff",
+              "tertiary": "#ff716a",
+              "on-tertiary": "#490005",
+              "error": "#ff716c",
+              "surface-container-lowest": "#000000",
+              "surface-container": "#19191c",
+              "primary-fixed-dim": "#00ef99",
+              "on-secondary-fixed": "#003271",
+              "secondary": "#699cff",
+              "surface-container-high": "#1f1f22",
+              "on-tertiary-container": "#1f0001",
+              "surface-tint": "#b1ffce"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272A;
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 border-b border-[#27272A] bg-[#09090B] dark:bg-[#09090B]">
+<div class="flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#00FFA3] active:scale-95 transition-transform">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline font-bold tracking-tighter uppercase text-2xl text-[#00FFA3]">DIGITAL AGORA</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-end">
+<span class="font-label text-[10px] text-zinc-500 uppercase tracking-widest">Active Logic Node</span>
+<span class="font-headline text-sm text-[#00FFA3] uppercase">Friedrich Nietzsche</span>
+</div>
+<button class="text-zinc-400 hover:text-[#00FFA3] transition-colors duration-200 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-16 pb-40 min-h-screen max-w-4xl mx-auto px-6">
+<!-- Conversation Header / Metadata -->
+<div class="py-12 flex flex-col items-start gap-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high border border-outline-variant/20 rounded-sm">
+<span class="w-2 h-2 rounded-full bg-primary-fixed shadow-[0_0_8px_rgba(0,255,163,0.5)]"></span>
+<span class="font-label text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">Session: Existential Synthesis</span>
+</div>
+<h2 class="font-headline text-5xl md:text-7xl leading-none text-on-surface tracking-tighter">
+                THE DEATH <br/> OF GOD.
+            </h2>
+<p class="font-label text-sm text-[#00FFA3] mt-2 opacity-80 uppercase tracking-widest">Synthesizing: Thus Spoke Zarathustra (1883)</p>
+</div>
+<!-- Chat Stream -->
+<div class="space-y-12">
+<!-- AI Bubble -->
+<div class="flex flex-col items-start gap-3 max-w-[85%]">
+<div class="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">Analytical Output_01</div>
+<div class="bg-[#18181B] p-6 border-l-2 border-primary-fixed rounded-[2px]">
+<p class="text-lg leading-relaxed text-on-surface font-body">
+                        You ask of the void. I tell you: God is dead. God remains dead. And we have killed him. How shall we comfort ourselves, the murderers of all murderers? What was holiest and mightiest of all that the world has yet owned has bled to death under our knives: who will wipe this blood off us?
+                    </p>
+</div>
+<div class="flex gap-4 px-1">
+<button class="font-label text-[10px] text-zinc-600 hover:text-primary transition-colors uppercase">Cite Logic</button>
+<button class="font-label text-[10px] text-zinc-600 hover:text-primary transition-colors uppercase">Branch Thought</button>
+</div>
+</div>
+<!-- User Bubble -->
+<div class="flex flex-col items-end gap-3 ml-auto max-w-[80%]">
+<div class="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">User Inquiry</div>
+<div class="border border-[#27272A] p-6 bg-transparent rounded-[2px] backdrop-blur-sm">
+<p class="text-lg leading-relaxed text-zinc-300">
+                        If the old foundations are gone, what replaces the structure of morality? Are we not destined for a descent into nihilism?
+                    </p>
+</div>
+</div>
+<!-- AI Bubble -->
+<div class="flex flex-col items-start gap-3 max-w-[85%]">
+<div class="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">Analytical Output_02</div>
+<div class="bg-[#18181B] p-6 border-l-2 border-primary-fixed rounded-[2px]">
+<p class="text-lg leading-relaxed text-on-surface font-body">
+                        Nihilism is but a transitional stage. The "Higher Man" does not mourn the loss of the old sun; he becomes his own light. We must create our own values. He who has a <span class="text-primary italic">why</span> to live can bear almost any <span class="text-primary italic">how</span>.
+                    </p>
+<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-lowest border border-outline-variant/10 rounded-sm">
+<span class="font-label text-[10px] text-[#00FFA3] block mb-2">FRICTION DETECTED</span>
+<p class="text-xs text-zinc-500 uppercase leading-tight tracking-wider">Circular reasoning check in progress: Moral Objectivity vs Subjective Creation.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Response Loading -->
+<div class="flex flex-col items-start gap-3">
+<div class="font-label text-[10px] text-zinc-500 uppercase tracking-widest px-1">Synthesizing...</div>
+<div class="flex gap-1 items-center px-1">
+<span class="font-label text-[#00FFA3] text-xl blinking-cursor">_</span>
+<span class="font-label text-[#00FFA3] text-xl opacity-40">_</span>
+<span class="font-label text-[#00FFA3] text-xl opacity-20">_</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Input Shell -->
+<section class="fixed bottom-0 left-0 w-full z-50 bg-[#0e0e10]/95 backdrop-blur-2xl border-t border-[#27272A]">
+<div class="max-w-4xl mx-auto px-6 pt-4 pb-8">
+<!-- Context Analyzer Toggle -->
+<div class="flex items-center gap-2 mb-4 group cursor-pointer">
+<div class="w-8 h-4 bg-primary-fixed/20 rounded-full relative flex items-center px-1 border border-primary-fixed/30">
+<div class="w-2 h-2 bg-primary-fixed rounded-full shadow-[0_0_8px_#00FFA3]"></div>
+</div>
+<span class="font-label text-[10px] text-[#00FFA3] uppercase tracking-[0.2em] group-hover:drop-shadow-[0_0_4px_rgba(0,255,163,0.5)] transition-all">CONTEXT ANALYZER: ON</span>
+</div>
+<!-- Expanding Input Area -->
+<div class="relative bg-surface-container-lowest border-b border-primary-fixed flex items-end p-2 transition-all focus-within:bg-surface-container">
+<button class="p-3 text-zinc-500 hover:text-on-surface transition-colors active:scale-90">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body resize-none py-3 px-2 placeholder:text-zinc-600 placeholder:font-label placeholder:text-xs placeholder:tracking-widest" placeholder="CHALLENGE THE SUPPOSED TRUTH..." rows="1"></textarea>
+<div class="flex items-center gap-2 p-1">
+<button class="p-3 text-zinc-500 hover:text-on-surface transition-colors active:scale-90">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="bg-primary-fixed text-black h-10 w-10 flex items-center justify-center rounded-[2px] hover:shadow-[0_0_15px_rgba(0,255,163,0.4)] transition-all active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+<!-- Quick Logic Tags -->
+<div class="flex gap-3 mt-4 overflow-x-auto pb-2 scrollbar-hide">
+<button class="whitespace-nowrap font-label text-[9px] text-zinc-500 border border-outline-variant/30 px-3 py-1 rounded-sm hover:border-primary-fixed hover:text-on-surface transition-all uppercase tracking-widest">Historical Context</button>
+<button class="whitespace-nowrap font-label text-[9px] text-zinc-500 border border-outline-variant/30 px-3 py-1 rounded-sm hover:border-primary-fixed hover:text-on-surface transition-all uppercase tracking-widest">Logical Fallacy Check</button>
+<button class="whitespace-nowrap font-label text-[9px] text-zinc-500 border border-outline-variant/30 px-3 py-1 rounded-sm hover:border-primary-fixed hover:text-on-surface transition-all uppercase tracking-widest">Socratic Counter</button>
+<button class="whitespace-nowrap font-label text-[9px] text-zinc-500 border border-outline-variant/30 px-3 py-1 rounded-sm hover:border-primary-fixed hover:text-on-surface transition-all uppercase tracking-widest">Paradox Identification</button>
+</div>
+</div>
+</section>
+<!-- Navigation Overlay (Bottom Navigation suppressed per rules for task-focused dialogue) -->
+<!-- The BottomNavBar from JSON is suppressed because this is a focused Task/Dialogue flow -->
+</body></html>
