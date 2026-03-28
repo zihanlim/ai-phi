@@ -17,9 +17,8 @@ export async function GET(request: NextRequest) {
       where: { userId },
       include: {
         participants: {
-          include: {
-            philosopher: true,
-          },
+          include: { philosopher: true },
+          orderBy: { position: "asc" },
         },
         messages: {
           orderBy: { createdAt: "desc" },
@@ -29,7 +28,18 @@ export async function GET(request: NextRequest) {
       orderBy: { updatedAt: "desc" },
     });
 
-    return NextResponse.json(conversations);
+    // Transform to match frontend expected shape
+    const transformed = conversations.map((conv) => ({
+      id: conv.id,
+      title: conv.title || "Untitled",
+      philosopherIds: conv.participants.map((p) => p.philosopherId),
+      philosopherNames: conv.participants.map((p) => p.philosopher.name),
+      lastMessage: conv.messages[0]?.content || "",
+      updatedAt: conv.updatedAt.toISOString(),
+      type: conv.participants.length > 1 ? "debate" : "dialogue",
+    }));
+
+    return NextResponse.json(transformed);
   } catch (error) {
     console.error("Error fetching conversations:", error);
     return NextResponse.json(
@@ -64,9 +74,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         participants: {
-          include: {
-            philosopher: true,
-          },
+          include: { philosopher: true },
         },
       },
     });
@@ -87,10 +95,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "id required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "id required" }, { status: 400 });
     }
 
     await prisma.conversation.delete({ where: { id } });

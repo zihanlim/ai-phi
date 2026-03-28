@@ -32,13 +32,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { conversationId, philosopherIds, message, provider } = body;
+    const { conversationId, philosopherIds, message, provider, userId } = body;
 
-    if (!conversationId || !philosopherIds || !message) {
+    if (!philosopherIds || !message) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: philosopherIds and message are required" },
         { status: 400 }
       );
+    }
+
+    // If conversationId not provided, create a new conversation first
+    let convId = conversationId;
+    if (!convId) {
+      const userIdToUse = userId || "anonymous";
+      const philosopherList = await prisma.philosopher.findMany({
+        where: { id: { in: philosopherIds } },
+        select: { id: true, name: true },
+      });
+      const title = philosopherList.length === 1
+        ? `Dialogue with ${philosopherList[0].name}`
+        : `Debate: ${philosopherList.map(p => p.name).join(" vs ")}`;
+      const conv = await prisma.conversation.create({
+        data: {
+          userId: userIdToUse,
+          title,
+          participants: {
+            create: philosopherIds.map((philosopherId: string, index: number) => ({
+              philosopherId,
+              position: index,
+            })),
+          },
+        },
+      });
+      convId = conv.id;
     }
 
     const philosophers = await prisma.philosopher.findMany({
@@ -53,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     const existingMessages = await prisma.message.findMany({
-      where: { conversationId },
+      where: { conversationId: convId },
       orderBy: { createdAt: "asc" },
     });
 
@@ -65,13 +91,13 @@ export async function POST(request: NextRequest) {
     chatHistory.push({ role: "user", content: message });
 
     const results = await Promise.all(
-      philosophers.map(async (philosopher: { id: string; systemPrompt: string }) => {
+      philosophers.map(async (philosopher: { id: string; name: string; systemPrompt: string }) => {
         try {
           const response = await chat(chatHistory, philosopher.systemPrompt, provider);
 
           await prisma.message.create({
             data: {
-              conversationId,
+              conversationId: convId!,
               role: "user",
               content: message,
             },
@@ -79,20 +105,24 @@ export async function POST(request: NextRequest) {
 
           await prisma.message.create({
             data: {
-              conversationId,
+              conversationId: convId!,
               role: "assistant",
               content: response,
             },
           });
 
           return {
+            conversationId: convId,
             philosopherId: philosopher.id,
+            philosopherName: philosopher.name,
             response,
             error: null,
           };
         } catch (err) {
           return {
+            conversationId: convId,
             philosopherId: philosopher.id,
+            philosopherName: philosopher.name,
             response: null,
             error: err instanceof Error ? err.message : "Unknown error",
           };
@@ -100,7 +130,7 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    return NextResponse.json({ results });
+    return NextResponse.json({ results, conversationId: convId });
   } catch (error) {
     console.error("Chat error:", error);
     return NextResponse.json(
