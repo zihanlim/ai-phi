@@ -13,6 +13,7 @@
   --secondary-dim: #699cff;
   --secondary-fixed: #bfd1ff;
   --secondary-fixed-dim: #a9c4ff;
+  --secondary-container: #005ac2;
   --on-secondary: #001e4a;
   --on-secondary-fixed-variant: #004da8;
 
@@ -26,7 +27,10 @@
   --surface-dim: #0e0e10;
   --surface-variant: #262528;
   --surface-container-low: #131315;
+  --surface-container: #19191c;
+  --surface-container-high: #1f1f22;
   --surface-container-highest: #262528;
+  --surface-container-lowest: #000000;
   --on-surface: #f9f5f8;
   --on-surface-variant: #adaaad;
 
@@ -40,7 +44,7 @@
   --inverse-on-surface: #565457;
   --inverse-primary: #006d43;
 
-  --error: #d7383b;
+  --error: #ff716c;
   --error-dim: #d7383b;
   --error-container: #9f0519;
   --on-error-container: #ffa8a3;
@@ -63,6 +67,7 @@
   --color-secondary-dim: var(--secondary-dim);
   --color-secondary-fixed: var(--secondary-fixed);
   --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-secondary-container: var(--secondary-container);
   --color-on-secondary: var(--on-secondary);
   --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
 
@@ -76,7 +81,10 @@
   --color-surface-dim: var(--surface-dim);
   --color-surface-variant: var(--surface-variant);
   --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
   --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-container-lowest: var(--surface-container-lowest);
   --color-on-surface: var(--on-surface);
   --color-on-surface-variant: var(--on-surface-variant);
 
@@ -100,6 +108,10 @@
   --font-family-sans: var(--font-sans);
   --font-family-display: var(--font-display);
   --font-family-mono: var(--font-mono);
+
+  --font-headline: var(--font-display);
+  --font-body: var(--font-sans);
+  --font-label: var(--font-mono);
 }
 
 * {
@@ -118,4 +130,68 @@ body {
 
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.font-headline {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-sans);
+}
+
+.font-label {
+  font-family: var(--font-mono);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes blink {
+  from,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.blinking-cursor {
+  animation: blink 1s step-end infinite;
+}
+
+.text-glow {
+  text-shadow: 0 0 12px rgba(0, 255, 163, 0.4);
+}
+
+.hero-gradient {
+  background: linear-gradient(to bottom, transparent 0%, #09090b 100%);
+}
+
+.neon-border-glow-primary {
+  box-shadow: 0 0 15px rgba(0, 255, 163, 0.15);
+}
+
+.neon-border-glow-error {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+}
+
+.glass-panel {
+  background: rgba(14, 14, 16, 0.7);
+  backdrop-filter: blur(12px);
+}
+
+.diagonal-split {
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+}
+
+.diagonal-split-reverse {
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
 }

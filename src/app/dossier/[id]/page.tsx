@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
@@ -14,166 +15,267 @@ interface Philosopher {
   imageUrl?: string;
 }
 
-const mockPhilosophers: Philosopher[] = [
-  {
-    id: "1",
-    name: "Socrates",
-    era: "470-399 BCE",
-    tradition: "Western",
-    bio: "Greek philosopher who founded the Socratic method of inquiry. He believed in pursuing truth through systematic questioning and viewed philosophy as a preparation for death. Socrates wrote nothing himself; our knowledge of his philosophy comes from his students Plato and Xenophon.",
-    works: ["Apology", "Republic", "Phaedo", "Symposium", "Gorgias", "Meno"],
-    ideas: ["The examined life", "Socratic method", "Virtue is knowledge", "Irony", "Dialectic", "Know thyself"],
-  },
-  {
-    id: "2",
-    name: "Confucius",
-    era: "551-479 BCE",
-    tradition: "Eastern",
-    bio: "Chinese philosopher whose teachings emphasized personal morality, social harmony, and justice. His ideas formed the basis of East Asian culture and society for over two millennia. He believed that self-cultivation leads to virtuous governance.",
-    works: ["Analects", "The Five Classics", "The Book of Changes", "The Great Learning"],
-    ideas: ["Ren (benevolence)", "Li (ritual)", "Social harmony", "Filial piety", "Rectification", "Junzi (noble person)"],
-  },
-  {
-    id: "3",
-    name: "Lao Tzu",
-    era: "6th century BCE",
-    tradition: "Eastern",
-    bio: "Founder of Taoism, credited with writing the Tao Te Ching. He advocated for living in harmony with the Tao (the Way) through Wu Wei (non-action). His philosophy emphasizes naturalness, simplicity, and spontaneity.",
-    works: ["Tao Te Ching", "Zhuangzi (attributed)"],
-    ideas: ["Wu wei (non-action)", "Tao (the Way)", "Naturalness", "Simplicity", "Te (virtue)", "Yielding"],
-  },
-  {
-    id: "4",
-    name: "Nietzsche",
-    era: "1844-1900",
-    tradition: "Western",
-    bio: "German philosopher known for his critique of traditional European morality and religion. He proclaimed the death of God and introduced concepts like the Übermensch and the will to power, challenging conventional values.",
-    works: ["Thus Spoke Zarathustra", "Beyond Good and Evil", "The Birth of Tragedy", "On the Genealogy of Morals", "The Antichrist"],
-    ideas: ["Übermensch", "Will to power", "Eternal recurrence", "Master-slave morality", "Nihilism", "Amor fati"],
-  },
-  {
-    id: "5",
-    name: "Simone de Beauvoir",
-    era: "1908-1986",
-    tradition: "Western",
-    bio: "French existentialist philosopher who wrote extensively on gender and identity. Her work 'The Second Sex' became foundational for feminist theory, arguing that 'one is not born a woman, but becomes one.'",
-    works: ["The Second Sex", "She Came to Stay", "The Ethics of Ambiguity", "All Men Are Mortal"],
-    ideas: ["Existentialist feminism", "The Other", "Gender performativity", "Freedom", "Ambiguity", "Engagement"],
-  },
-  {
-    id: "6",
-    name: "Frantz Fanon",
-    era: "1925-1961",
-    tradition: "African",
-    bio: "Martinican-French psychiatrist and philosopher who wrote about colonialism, violence, and decolonization. His work influenced liberation movements in Africa, Asia, and the Americas.",
-    works: ["The Wretched of the Earth", "Black Skin, White Masks", "A Dying Colonialism", "Toward the Astrocyte"],
-    ideas: ["Colonial violence", "Decolonization", "Psychic alienation", "National consciousness", "Revolution", "The lumpenproletariat"],
-  },
-  {
-    id: "7",
-    name: "Wang Yangming",
-    era: "1472-1529",
-    tradition: "Eastern",
-    bio: "Chinese philosopher who developed the school of Neo-Confucianism known as the School of the Mind. He emphasized innate moral consciousness and the unity of knowledge and action.",
-    works: ["Instructions for Practical Living", "Chuan Xi Lu", "Record of Great Learning"],
-    ideas: ["Xin (mind)", "Zhi xing he yi", "innate moral knowledge", "Unity of knowledge and action", "Pure knowing", "Li (principle)"],
-  },
-  {
-    id: "8",
-    name: "Aristotle",
-    era: "384-322 BCE",
-    tradition: "Western",
-    bio: "Greek philosopher who wrote on physics, biology, ethics, politics, and logic. He systematized knowledge and emphasized empirical observation, founding the Lyceum in Athens.",
-    works: ["Nicomachean Ethics", "Politics", "Metaphysics", "Poetics", "Physics", "Organon"],
-    ideas: ["Golden mean", "Teleology", "Virtue ethics", "Logic", "Four causes", "Hylomorphism"],
-  },
-];
-
 export default function PhilosopherDossierPage() {
   const params = useParams();
-  const philosopher = mockPhilosophers.find((p) => p.id === params.id);
+  const [philosopher, setPhilosopher] = useState<Philosopher | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPhilosopher() {
+      try {
+        const res = await fetch("/api/philosophers");
+        if (res.ok) {
+          const data = await res.json();
+          const found = data.find((p: Philosopher) => p.id === params.id);
+          setPhilosopher(found || null);
+        }
+      } catch {
+        console.error("Failed to fetch philosopher");
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (params.id) {
+      fetchPhilosopher();
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <>
+        <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
+          <div className="flex items-center gap-4">
+            <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
+              <span className="material-symbols-outlined">menu</span>
+            </Link>
+            <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
+              DIGITAL AGORA
+            </h1>
+          </div>
+          <span className="material-symbols-outlined text-primary">notifications</span>
+        </header>
+        <main className="pt-16 pb-32 min-h-screen flex items-center justify-center">
+          <div className="flex gap-1 items-center">
+            <span className="font-label text-primary text-xl blinking-cursor">_</span>
+            <span className="font-label text-primary text-xl opacity-40">_</span>
+            <span className="font-label text-primary text-xl opacity-20">_</span>
+          </div>
+        </main>
+      </>
+    );
+  }
 
   if (!philosopher) {
     return (
-      <main className="min-h-screen p-4 md:p-6">
-        <header className="mb-6">
-          <Link href="/dossier" className="text-primary hover:underline mb-4 inline-block">
-            ← Back to Dossiers
-          </Link>
-          <h1 className="text-3xl font-display text-primary">Philosopher not found</h1>
+      <>
+        <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
+          <div className="flex items-center gap-4">
+            <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
+              <span className="material-symbols-outlined">menu</span>
+            </Link>
+            <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
+              DIGITAL AGORA
+            </h1>
+          </div>
+          <span className="material-symbols-outlined text-primary">notifications</span>
         </header>
-      </main>
+        <main className="pt-16 pb-32 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="font-headline text-2xl text-primary mb-2">Philosopher not found</h2>
+            <Link href="/dossier" className="text-secondary hover:underline">
+              ← Back to Dossiers
+            </Link>
+          </div>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="min-h-screen p-4 md:p-6">
-      <Link href="/dossier" className="text-primary hover:underline mb-4 inline-block">
-        ← Back to Dossiers
-      </Link>
+    <>
+      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
+        <div className="flex items-center gap-4">
+          <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
+            <span className="material-symbols-outlined">menu</span>
+          </Link>
+          <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
+            DIGITAL AGORA
+          </h1>
+        </div>
+        <div className="flex items-center gap-6">
+          <nav className="hidden md:flex gap-8 font-label text-[10px] uppercase tracking-widest">
+            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/">
+              Archive
+            </Link>
+            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/">
+              Hub
+            </Link>
+            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/settings">
+              Settings
+            </Link>
+          </nav>
+          <span className="material-symbols-outlined text-primary">notifications</span>
+        </div>
+      </header>
 
-      <article className="max-w-3xl mx-auto">
-        <header className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="font-display text-primary text-3xl">
+      <main className="pt-16 pb-32 min-h-screen">
+        <section className="relative w-full h-[397px] md:h-[530px] overflow-hidden bg-surface-container-lowest">
+          {philosopher.imageUrl ? (
+            <img
+              src={philosopher.imageUrl}
+              alt={philosopher.name}
+              className="w-full h-full object-cover grayscale contrast-125 opacity-60"
+            />
+          ) : (
+            <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+              <span className="font-headline text-9xl text-zinc-600">
                 {philosopher.name.charAt(0)}
               </span>
             </div>
-            <div>
-              <h1 className="text-4xl font-display text-primary mb-1">
-                {philosopher.name}
-              </h1>
-              <p className="text-lg text-on-surface-variant">
-                {philosopher.era} · {philosopher.tradition} Philosophy
-              </p>
+          )}
+          <div className="absolute inset-0 hero-gradient" />
+          <div className="absolute bottom-0 left-0 w-full px-6 pb-12 md:px-12">
+            <div className="flex flex-col gap-2">
+              <span className="font-label text-primary text-sm tracking-[0.3em] font-bold">
+                {philosopher.era}
+              </span>
+              <h2 className="font-headline text-5xl md:text-8xl font-bold tracking-tighter uppercase leading-none">
+                {philosopher.name.split(" ").map((word, i, arr) => (
+                  <span key={i}>
+                    {word}
+                    {i < arr.length - 1 && <br />}
+                  </span>
+                ))}
+              </h2>
             </div>
           </div>
-        </header>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-display text-on-surface mb-3">Biography</h2>
-          <p className="text-on-surface-variant leading-relaxed">{philosopher.bio}</p>
         </section>
 
-        <section className="mb-8">
-          <h2 className="text-xl font-display text-on-surface mb-3">Major Works</h2>
-          <ul className="space-y-2">
-            {philosopher.works.map((work, i) => (
-              <li key={i} className="flex items-center gap-3 text-on-surface-variant">
-                <span className="material-symbols-outlined text-primary text-xl">
-                  menu_book
-                </span>
-                {work}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-display text-on-surface mb-3">Key Ideas</h2>
-          <div className="flex flex-wrap gap-2">
-            {philosopher.ideas.map((idea, i) => (
-              <span
-                key={i}
-                className="px-4 py-2 rounded-full bg-surface-variant text-on-surface-variant hover:bg-primary hover:text-on-primary transition-colors"
-              >
-                {idea}
-              </span>
-            ))}
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12 mt-12">
+          <div className="md:col-span-4 flex flex-col gap-8">
+            <div className="p-6 bg-surface-container-high border-l-2 border-primary">
+              <h3 className="font-label text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+                Core Identity
+              </h3>
+              <p className="text-xl leading-relaxed font-light text-on-surface">
+                {philosopher.bio.slice(0, 150)}...
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <h3 className="font-label text-[10px] uppercase tracking-[0.2em] text-outline">
+                Intellectual Status
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {philosopher.ideas.slice(0, 3).map((idea, i) => (
+                  <span
+                    key={i}
+                    className={`px-3 py-1 text-[10px] font-label uppercase border ${
+                      i === 0
+                        ? "bg-error-container/20 text-error border-error/20"
+                        : i === 1
+                        ? "bg-secondary-container/20 text-secondary border-secondary/20"
+                        : "bg-surface-container-highest text-on-surface-variant"
+                    }`}
+                  >
+                    {idea}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-        </section>
 
-        <section className="border-t border-outline-variant pt-6">
-          <Link
-            href={`/dialogue?philosopher=${philosopher.id}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-medium hover:bg-primary-dim transition-colors"
+          <div className="md:col-span-8 flex flex-col gap-12">
+            <article className="bg-surface-container p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <span className="material-symbols-outlined text-9xl">psychology</span>
+              </div>
+              <h3 className="font-headline text-3xl font-bold mb-6 tracking-tight">
+                The Radical Questioning of Truth
+              </h3>
+              <div className="space-y-6 text-on-surface-variant leading-relaxed">
+                <p>{philosopher.bio}</p>
+                <p>
+                  Through the concept of the{" "}
+                  <span className="text-on-surface font-semibold">
+                    {philosopher.ideas[0] || "intellectual framework"}
+                  </span>
+                  , this thinker has shaped the course of philosophical inquiry for generations.
+                </p>
+              </div>
+              <div className="mt-8 pt-8 border-t border-outline-variant/30 flex justify-between items-center">
+                <span className="font-label text-xs text-primary">SYNTHESIS COMPLETE</span>
+                <span className="font-label text-[10px] text-outline">REF: Dossier_{philosopher.id}</span>
+              </div>
+            </article>
+
+            <div>
+              <h3 className="font-headline text-2xl font-bold mb-8 flex items-center gap-3">
+                <span className="w-8 h-[2px] bg-primary" />
+                MAJOR WORKS
+              </h3>
+              <div className="space-y-1">
+                {philosopher.works.map((work, i) => (
+                  <div
+                    key={i}
+                    className="group flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-label text-[10px] text-primary mb-1">
+                        {philosopher.era.split("-")[0]}
+                      </span>
+                      <h4 className="font-headline text-lg uppercase font-bold tracking-tight group-hover:text-primary transition-colors">
+                        {work}
+                      </h4>
+                    </div>
+                    <span className="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all">
+                      arrow_forward_ios
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div className="fixed bottom-0 left-0 w-full z-40 p-6 md:p-8 flex justify-center pointer-events-none">
+        <Link
+          href={`/dialogue?philosopher=${philosopher.id}`}
+          className="pointer-events-auto bg-primary text-surface-container-lowest px-12 py-5 rounded-sm font-headline font-bold text-xl uppercase tracking-[0.2em] flex items-center gap-4 hover:shadow-[0_0_30px_rgba(0,255,163,0.4)] transition-all active:scale-95 group"
+        >
+          ENGAGE MIND
+          <span
+            className="material-symbols-outlined font-bold group-hover:rotate-45 transition-transform"
+            style={{ fontVariationSettings: "'wght' 700" }}
           >
-            <span className="material-symbols-outlined">chat</span>
-            Start a Dialogue
-          </Link>
-        </section>
-      </article>
-    </main>
+            bolt
+          </span>
+        </Link>
+      </div>
+
+      <nav className="md:hidden bg-surface/80 backdrop-blur-xl border-t border-outline-variant fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-4 z-50">
+        <Link
+          href="/"
+          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        >
+          <span className="material-symbols-outlined">grid_view</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Hub</span>
+        </Link>
+        <Link
+          href="/archive"
+          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        >
+          <span className="material-symbols-outlined">history_edu</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Archive</span>
+        </Link>
+        <Link
+          href="/settings"
+          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        >
+          <span className="material-symbols-outlined">settings</span>
+          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Settings</span>
+        </Link>
+      </nav>
+    </>
   );
 }
