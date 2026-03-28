@@ -1,0 +1,82 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "userId is required" },
+        { status: 400 }
+      );
+    }
+
+    const conversations = await prisma.conversation.findMany({
+      where: { userId },
+      include: {
+        participants: {
+          include: {
+            philosopher: true,
+          },
+        },
+        messages: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return NextResponse.json(conversations);
+  } catch (error) {
+    console.error("Error fetching conversations:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userId, philosopherIds, title } = body;
+
+    if (!userId || !philosopherIds || philosopherIds.length === 0) {
+      return NextResponse.json(
+        { error: "userId and philosopherIds are required" },
+        { status: 400 }
+      );
+    }
+
+    const conversation = await prisma.conversation.create({
+      data: {
+        userId,
+        title: title || `Chat with ${philosopherIds.length} philosopher(s)`,
+        participants: {
+          create: philosopherIds.map((philosopherId: string, index: number) => ({
+            philosopherId,
+            position: index,
+          })),
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            philosopher: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(conversation);
+  } catch (error) {
+    console.error("Error creating conversation:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

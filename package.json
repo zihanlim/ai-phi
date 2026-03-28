@@ -1,0 +1,31 @@
+{
+  "name": "ai-phi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "15.2.2",
+    "@prisma/client": "^6.6.0",
+    "openai": "^4.93.0",
+    "@anthropic-ai/sdk": "^0.39.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "@types/node": "^20.17.9",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "tailwindcss": "^4.1.3",
+    "@tailwindcss/postcss": "^4.1.3",
+    "postcss": "^8.5.3",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "15.2.2",
+    "prisma": "^6.6.0"
+  }
+}

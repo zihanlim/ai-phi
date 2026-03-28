@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  collections   Collection[]
+}
+
+model Philosopher {
+  id          String   @id @default(cuid())
+  name        String
+  era         String
+  tradition   String
+  bio         String
+  works       String[]
+  ideas       String[]
+  systemPrompt String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  conversationParticipants ConversationParticipant[]
+  collectionItems          CollectionItem[]
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  title     String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id            String      @id @default(cuid())
+  conversationId String
+  philosopherId  String
+  position      Int         @default(0)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  philosopher   Philosopher  @relation(fields: [philosopherId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, philosopherId])
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  conversationId String
+  role          String
+  content       String
+  createdAt     DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CollectionItem[]
+}
+
+model CollectionItem {
+  id            String @id @default(cuid())
+  collectionId  String
+  philosopherId String
+
+  collection  Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  philosopher Philosopher @relation(fields: [philosopherId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, philosopherId])
+}
