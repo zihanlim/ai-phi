@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: "/", label: "Hub", icon: "grid_view" },
+  { href: "/debate", label: "Debate", icon: "groups" },
+  { href: "/dialogue", label: "Dialogue", icon: "chat" },
+  { href: "/dossier", label: "Dossier", icon: "menu_book" },
   { href: "/archive", label: "Archive", icon: "history_edu" },
   { href: "/settings", label: "Settings", icon: "settings" },
 ];
@@ -15,7 +18,7 @@ export function Navigation() {
   return (
     <nav className="fixed bottom-0 left-0 w-full h-20 bg-surface/80 backdrop-blur-xl border-t border-outline-variant flex justify-around items-center px-4 pb-4 z-50">
       {navItems.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
         return (
           <Link
             key={item.href}
