@@ -234,21 +234,64 @@ export default function PhilosopherDossierPage() {
                 ))}
               </div>
             </div>
+
+            <div>
+              <h3 className="font-headline text-2xl font-bold mb-8 flex items-center gap-3">
+                <span className="w-8 h-[2px] bg-secondary" />
+                KEY IDEAS
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                {philosopher.ideas.map((idea, i) => (
+                  <div
+                    key={i}
+                    className="bg-surface-container border border-outline-variant/10 p-6 rounded-sm hover:border-secondary/30 transition-all"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-sm bg-secondary/20 flex items-center justify-center shrink-0">
+                        <span className="font-headline text-secondary font-bold">
+                          {i + 1}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-headline text-lg uppercase tracking-tight text-on-surface mb-2">
+                          {idea}
+                        </h4>
+                        <p className="text-on-surface-variant text-sm leading-relaxed">
+                          A fundamental concept in {philosopher.name}&apos;s philosophical framework.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 w-full z-40 p-6 md:p-8 flex justify-center pointer-events-none">
+      <div className="fixed bottom-0 left-0 w-full z-40 p-6 md:p-8 flex flex-col md:flex-row justify-center items-center gap-4 pointer-events-none">
         <Link
           href={`/dialogue?philosopher=${philosopher.id}`}
-          className="pointer-events-auto bg-primary text-surface-container-lowest px-12 py-5 rounded-sm font-headline font-bold text-xl uppercase tracking-[0.2em] flex items-center gap-4 hover:shadow-[0_0_30px_rgba(0,255,163,0.4)] transition-all active:scale-95 group"
+          className="pointer-events-auto bg-primary text-surface-container-lowest px-8 py-4 rounded-sm font-headline font-bold text-lg uppercase tracking-[0.2em] flex items-center gap-3 hover:shadow-[0_0_30px_rgba(0,255,163,0.4)] transition-all active:scale-95 group"
         >
-          ENGAGE MIND
+          Start Dialogue
           <span
-            className="material-symbols-outlined font-bold group-hover:rotate-45 transition-transform"
+            className="material-symbols-outlined font-bold group-hover:rotate-12 transition-transform"
             style={{ fontVariationSettings: "'wght' 700" }}
           >
-            bolt
+            chat
+          </span>
+        </Link>
+        <Link
+          href={`/debate?philosopher=${philosopher.id}`}
+          className="pointer-events-auto bg-secondary text-surface-container-lowest px-8 py-4 rounded-sm font-headline font-bold text-lg uppercase tracking-[0.2em] flex items-center gap-3 hover:shadow-[0_0_30px_rgba(105,156,255,0.4)] transition-all active:scale-95 group"
+        >
+          Add to Debate
+          <span
+            className="material-symbols-outlined font-bold group-hover:rotate-12 transition-transform"
+            style={{ fontVariationSettings: "'wght' 700" }}
+          >
+            compare
           </span>
         </Link>
       </div>

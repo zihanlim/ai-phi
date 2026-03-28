@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { ComparisonView } from "@/components/ComparisonView";
+import { Navigation } from "@/components/Navigation";
 
 interface Philosopher {
   id: string;
@@ -14,86 +17,139 @@ interface Philosopher {
   imageUrl?: string;
 }
 
-interface Argument {
+interface ComparisonMessage {
   id: string;
   philosopherId: string;
   philosopherName: string;
-  tradition: string;
-  argumentType: string;
-  content: string[];
-  references: string[];
-  alignment?: number;
+  content: string;
 }
 
-const mockPhilosophers: Philosopher[] = [
-  {
-    id: "aristotle",
-    name: "Aristotle",
-    era: "384-322 BCE",
-    tradition: "Classical Virtue",
-    bio: "Greek philosopher who wrote on ethics, politics, logic, and biology.",
-    works: ["Nicomachean Ethics", "Politics", "Metaphysics"],
-    ideas: ["Golden mean", "Teleology", "Virtue ethics"],
-    imageUrl: "https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=400&q=80",
-  },
-  {
-    id: "machiavelli",
-    name: "Machiavelli",
-    era: "1469-1527",
-    tradition: "Political Realism",
-    bio: "Italian diplomat and philosopher known for The Prince.",
-    works: ["The Prince", "Discourses on Livy"],
-    ideas: ["Necessità", "Raison d'État", "Political realism"],
-    imageUrl: "https://images.unsplash.com/photo-1607705703571-c5a8695f18f6?w=400&q=80",
-  },
-];
+function DebateContent() {
+  const searchParams = useSearchParams();
+  const [philosophers, setPhilosophers] = useState<Philosopher[]>([]);
+  const [selectedPhilosophers, setSelectedPhilosophers] = useState<string[]>([]);
+  const [question, setQuestion] = useState("");
+  const [messages, setMessages] = useState<ComparisonMessage[]>([]);
+  const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
-const mockArguments: Argument[] = [
-  {
-    id: "1",
-    philosopherId: "aristotle",
-    philosopherName: "Aristotle",
-    tradition: "Classical Virtue",
-    argumentType: "Teleological Ethics",
-    content: [
-      "Politics is the master art of the highest good. The state exists not merely for life, but for the good life. If a ruler pursues power as an end, they cease to be a statesman and become a tyrant.",
-      "True authority stems from virtuous character. A leader must embody the golden mean, for any action taken through cruelty or deceit fractures the social teleology that binds citizens together.",
-    ],
-    references: ["Eudaimonia", "The Golden Mean"],
-    alignment: 74.2,
-  },
-  {
-    id: "2",
-    philosopherId: "machiavelli",
-    philosopherName: "Machiavelli",
-    tradition: "Political Realism",
-    argumentType: "Pragmatic Realism",
-    content: [
-      "The gap between how one lives and how one ought to live is so wide that a man who neglects what is done for what ought to be done learns his ruin.",
-      "A prince must be both a lion and a fox. To maintain the stability of the state, he must often act against faith, against charity, and against humanity. Virtue in politics is not morality, but effective agency.",
-    ],
-    references: ["Necessità", "Raison d'État"],
-    alignment: 74.2,
-  },
-];
+  // Handle pre-selected philosopher from query param
+  useEffect(() => {
+    const philosopherId = searchParams.get("philosopher");
+    if (philosopherId) {
+      setSelectedPhilosophers([philosopherId]);
+    }
+  }, [searchParams]);
 
-export default function DebatePage() {
-  const [showSynthesis, setShowSynthesis] = useState(false);
+  // Fetch philosophers
+  useEffect(() => {
+    async function fetchPhilosophers() {
+      try {
+        const res = await fetch("/api/philosophers");
+        if (res.ok) {
+          const data = await res.json();
+          setPhilosophers(data);
+        }
+      } catch {
+        console.error("Failed to fetch philosophers");
+      } finally {
+        setLoadingPhilosophers(false);
+      }
+    }
+    fetchPhilosophers();
+  }, []);
+
+  const togglePhilosopher = (id: string) => {
+    setSelectedPhilosophers((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((p) => p !== id);
+      }
+      return [...prev, id];
+    });
+    setShowResults(false);
+    setMessages([]);
+  };
+
+  const handleSubmitQuestion = async () => {
+    if (!question.trim() || selectedPhilosophers.length < 1) return;
+
+    setIsLoading(true);
+    setShowResults(true);
+    setMessages([]);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          philosopherIds: selectedPhilosophers,
+          question: question,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Transform API response to ComparisonMessage format
+        const comparisonMessages: ComparisonMessage[] = data.responses.map(
+          (response: { philosopherId: string; philosopherName: string; response: string }, idx: number) => ({
+            id: `msg-${idx}`,
+            philosopherId: response.philosopherId,
+            philosopherName: response.philosopherName,
+            content: response.response,
+          })
+        );
+        setMessages(comparisonMessages);
+      } else {
+        // Fallback error message
+        const errorMessages: ComparisonMessage[] = selectedPhilosophers.map((id, idx) => {
+          const philosopher = philosophers.find((p) => p.id === id);
+          return {
+            id: `error-${idx}`,
+            philosopherId: id,
+            philosopherName: philosopher?.name || "Unknown",
+            content: "Unable to retrieve response. Please try again.",
+          };
+        });
+        setMessages(errorMessages);
+      }
+    } catch (error) {
+      console.error("Failed to submit question:", error);
+      const errorMessages: ComparisonMessage[] = selectedPhilosophers.map((id, idx) => {
+        const philosopher = philosophers.find((p) => p.id === id);
+        return {
+          id: `error-${idx}`,
+          philosopherId: id,
+          philosopherName: philosopher?.name || "Unknown",
+          content: "Network error. Please check your connection and try again.",
+        };
+      });
+      setMessages(errorMessages);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const selectedPhilosopherData = philosophers.filter((p) =>
+    selectedPhilosophers.includes(p.id)
+  );
 
   return (
     <>
       <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
         <div className="flex items-center gap-4">
-          <button className="text-primary active:scale-95 transition-transform">
+          <Link href="/" className="text-primary active:scale-95 transition-transform">
             <span className="material-symbols-outlined">menu</span>
-          </button>
+          </Link>
           <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
             DIGITAL AGORA
           </h1>
         </div>
         <div className="flex items-center gap-4">
           <span className="font-label text-[10px] text-zinc-500 uppercase tracking-[0.2em] hidden md:block">
-            Session: Logic_Matrix_042
+            Debate Chamber
           </span>
           <button className="text-primary active:scale-95 transition-transform">
             <span className="material-symbols-outlined">notifications</span>
@@ -101,188 +157,171 @@ export default function DebatePage() {
         </div>
       </header>
 
-      <main className="pt-16 pb-32 min-h-screen">
-        <section className="relative h-48 md:h-64 flex overflow-hidden border-b border-outline-variant/20">
-          <div className="relative flex-1 bg-surface-container-low flex flex-col justify-center items-start px-8 md:px-16 overflow-hidden">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              <img
-                src={mockPhilosophers[0].imageUrl}
-                alt={mockPhilosophers[0].name}
-                className="w-full h-full object-cover grayscale"
-              />
-            </div>
-            <div className="relative z-10">
-              <span className="font-label text-primary text-xs tracking-widest uppercase mb-2 block">
-                {mockPhilosophers[0].tradition}
-              </span>
-              <h2 className="font-headline font-bold text-4xl md:text-6xl tracking-tighter italic">
-                {mockPhilosophers[0].name}
-              </h2>
-            </div>
+      <main className="pt-16 pb-32 min-h-screen flex flex-col">
+        {/* Philosopher Selection Section */}
+        <section className="p-6 border-b border-outline-variant/20">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-primary">groups</span>
+            <h2 className="font-headline text-lg uppercase tracking-widest">
+              Select Philosophers (2+ recommended)
+            </h2>
           </div>
 
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <div className="h-full w-px bg-primary/20 rotate-[20deg] scale-y-150" />
-          </div>
-
-          <div className="relative flex-1 bg-surface flex flex-col justify-center items-end px-8 md:px-16 overflow-hidden">
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-              <img
-                src={mockPhilosophers[1].imageUrl}
-                alt={mockPhilosophers[1].name}
-                className="w-full h-full object-cover grayscale"
-              />
+          {loadingPhilosophers ? (
+            <div className="flex gap-1 items-center">
+              <span className="font-label text-primary text-xl blinking-cursor">_</span>
+              <span className="font-label text-primary text-xl opacity-40">_</span>
+              <span className="font-label text-primary text-xl opacity-20">_</span>
             </div>
-            <div className="relative z-10 text-right">
-              <span className="font-label text-secondary text-xs tracking-widest uppercase mb-2 block">
-                {mockPhilosophers[1].tradition}
-              </span>
-              <h2 className="font-headline font-bold text-4xl md:text-6xl tracking-tighter">
-                {mockPhilosophers[1].name}
-              </h2>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-0 relative">
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-outline-variant/10 z-0" />
-
-          {mockArguments.map((arg, idx) => (
-            <div
-              key={arg.id}
-              className={`p-8 md:p-12 lg:p-16 space-y-8 relative z-10 ${
-                idx === 0
-                  ? "border-b md:border-b-0 md:border-r border-outline-variant/10"
-                  : ""
-              }`}
-            >
-              <div className="flex items-center gap-3 font-label text-[10px] tracking-widest text-zinc-500 uppercase">
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    idx === 0 ? "bg-primary" : "bg-secondary"
-                  }`}
-                />
-                <span>Argument: {arg.argumentType}</span>
-              </div>
-              <div className="space-y-6">
-                {arg.content.map((paragraph, pIdx) => (
-                  <p
-                    key={pIdx}
-                    className={`text-xl md:text-2xl font-light leading-relaxed ${
-                      pIdx === 0 ? "text-on-surface/90" : "text-on-surface/70"
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {philosophers.map((philosopher) => {
+                const isSelected = selectedPhilosophers.includes(philosopher.id);
+                return (
+                  <button
+                    key={philosopher.id}
+                    onClick={() => togglePhilosopher(philosopher.id)}
+                    className={`px-4 py-2 rounded-sm font-label text-[10px] uppercase tracking-widest transition-all border ${
+                      isSelected
+                        ? "bg-primary text-surface-container-lowest border-primary"
+                        : "bg-surface-container text-zinc-400 hover:text-on-surface border-outline-variant/30 hover:border-primary/30"
                     }`}
                   >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-              <div className="pt-8 border-t border-outline-variant/10">
-                <div className="font-label text-[10px] text-zinc-600 uppercase mb-4">
-                  Referenced Logic
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {arg.references.map((ref, rIdx) => (
-                    <span
-                      key={rIdx}
-                      className={`px-2 py-1 bg-surface-container text-[10px] font-label border uppercase ${
-                        rIdx === 0
-                          ? idx === 0
-                            ? "text-primary border-primary/20"
-                            : "text-secondary border-secondary/20"
-                          : "text-zinc-400 border-outline-variant"
-                      }`}
-                    >
-                      {ref}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                    {philosopher.name}
+                  </button>
+                );
+              })}
             </div>
-          ))}
+          )}
+
+          {selectedPhilosophers.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="font-label text-[10px] text-zinc-500 uppercase">
+                Selected: {selectedPhilosophers.length}
+              </span>
+              {selectedPhilosopherData.map((p) => (
+                <span
+                  key={p.id}
+                  className="px-2 py-1 bg-surface-container-high text-primary text-[10px] font-label border border-primary/20"
+                >
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          )}
         </section>
 
-        <section className="px-6 md:px-16 mt-12 mb-20">
-          <div className="bg-surface-container border border-outline-variant/20 p-8 rounded-sm relative overflow-hidden">
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-[80px]" />
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 font-label text-[10px] font-bold text-primary tracking-[0.3em] uppercase">
-                  <span className="material-symbols-outlined text-sm">hub</span>
-                  POINT OF CONSENSUS
-                </div>
-                <h3 className="font-headline text-2xl font-bold tracking-tight">
-                  The Primacy of Stability
-                </h3>
-                <p className="text-on-surface-variant max-w-2xl leading-relaxed">
-                  Despite diverging on the <span className="italic text-on-surface">moral source</span> of
-                  authority, both thinkers agree that the fundamental failure of
-                  any political system is <strong className="text-primary">anarchy</strong>.
-                  Both prioritize the preservation of the political body as the
-                  prerequisite for any further human action.
-                </p>
-              </div>
-              <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
-                <div className="font-label text-[10px] text-zinc-500 uppercase">
-                  Alignment Probability
-                </div>
-                <div className="text-4xl font-headline font-bold text-primary">
-                  74.2%
-                </div>
-              </div>
+        {/* Question Input Section */}
+        <section className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="material-symbols-outlined text-secondary">help</span>
+            <h2 className="font-headline text-lg uppercase tracking-widest">
+              Pose Your Question
+            </h2>
+          </div>
+
+          <div className="relative">
+            <textarea
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="What philosophical question would you like to pose to these thinkers?"
+              rows={3}
+              className="w-full bg-surface-container border border-outline-variant/30 rounded-sm p-4 text-on-surface placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors resize-none font-body"
+            />
+            <div className="flex justify-between items-center mt-4">
+              <span className="font-label text-[10px] text-zinc-500">
+                Press Enter to submit · Shift+Enter for new line
+              </span>
+              <button
+                onClick={handleSubmitQuestion}
+                disabled={
+                  !question.trim() || selectedPhilosophers.length === 0 || isLoading
+                }
+                className={`px-6 py-3 rounded-sm font-headline font-bold uppercase tracking-widest flex items-center gap-2 transition-all active:scale-95 ${
+                  question.trim() && selectedPhilosophers.length > 0 && !isLoading
+                    ? "bg-primary text-surface-container-lowest hover:shadow-[0_0_20px_rgba(0,255,163,0.4)]"
+                    : "bg-surface-container text-zinc-600 cursor-not-allowed"
+                }`}
+              >
+                <span className="material-symbols-outlined">send</span>
+                Pose Question
+              </button>
             </div>
           </div>
         </section>
+
+        {/* Loading State */}
+        {isLoading && (
+          <section className="p-6">
+            <div className="bg-surface-container border border-outline-variant/20 rounded-sm p-8 text-center">
+              <div className="flex gap-1 items-center justify-center mb-4">
+                <span className="font-label text-primary text-2xl blinking-cursor">_</span>
+                <span className="font-label text-primary text-2xl opacity-40">_</span>
+                <span className="font-label text-primary text-2xl opacity-20">_</span>
+              </div>
+              <p className="font-headline text-lg uppercase tracking-widest text-zinc-400">
+                Philosophers Are Deliberating...
+              </p>
+              <p className="font-label text-[10px] text-zinc-600 mt-2 uppercase">
+                Retrieving wisdom from diverse traditions
+              </p>
+            </div>
+          </section>
+        )}
+
+        {/* Results Section */}
+        {showResults && messages.length > 0 && (
+          <section className="flex-1 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-secondary">compare</span>
+              <h2 className="font-headline text-lg uppercase tracking-widest">
+                Comparative Responses
+              </h2>
+            </div>
+            <div className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden h-[500px]">
+              <ComparisonView messages={messages} question={question} />
+            </div>
+          </section>
+        )}
+
+        {/* Empty State - When no question has been posed yet */}
+        {!showResults && !isLoading && (
+          <section className="flex-1 p-6 flex items-center justify-center">
+            <div className="text-center">
+              <span className="material-symbols-outlined text-6xl text-zinc-600 mb-4 block">
+                psychology
+              </span>
+              <h3 className="font-headline text-xl text-zinc-400 mb-2">
+                The Arena Awaits
+              </h3>
+              <p className="text-on-surface-variant text-sm max-w-md">
+                Select at least one philosopher and pose a question to see their
+                perspectives compared side by side.
+              </p>
+            </div>
+          </section>
+        )}
       </main>
 
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
-        <button
-          onClick={() => setShowSynthesis(true)}
-          className="bg-primary text-surface-container-lowest font-headline font-bold px-8 py-4 rounded-sm flex items-center gap-3 active:scale-95 transition-all hover:shadow-[0_0_45px_rgba(0,255,163,0.5)] border border-primary uppercase tracking-widest text-sm"
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            bolt
-          </span>
-          Generate Synthesis
-        </button>
-      </div>
-
-      <nav className="fixed bottom-0 left-0 w-full h-20 bg-surface/80 backdrop-blur-xl border-t border-outline-variant flex justify-around items-center px-4 pb-4 z-50">
-        <Link
-          href="/"
-          className="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] active:scale-90 transition-all"
-        >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            grid_view
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">
-            Hub
-          </span>
-        </Link>
-        <Link
-          href="/archive"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">history_edu</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">
-            Archive
-          </span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">
-            Settings
-          </span>
-        </Link>
-      </nav>
+      <Navigation />
     </>
+  );
+}
+
+export default function DebatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface flex items-center justify-center">
+          <div className="flex gap-1 items-center">
+            <span className="font-label text-primary text-xl blinking-cursor">_</span>
+            <span className="font-label text-primary text-xl opacity-40">_</span>
+            <span className="font-label text-primary text-xl opacity-20">_</span>
+          </div>
+        </div>
+      }
+    >
+      <DebateContent />
+    </Suspense>
   );
 }
