@@ -355,7 +355,6 @@ export default function DialoguePage() {
           <span className="font-label text-primary text-xl opacity-20">_</span>
         </div>
       </div>
-    }>
     >
       <DialogueContent />
     </Suspense>
