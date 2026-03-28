@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       });
       const title = philosopherList.length === 1
         ? `Dialogue with ${philosopherList[0].name}`
-        : `Debate: ${philosopherList.map(p => p.name).join(" vs ")}`;
+        : `Debate: ${philosopherList.map((p: { name: string }) => p.name).join(" vs ")}`;
       const conv = await prisma.conversation.create({
         data: {
           userId: userIdToUse,

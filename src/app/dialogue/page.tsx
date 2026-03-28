@@ -244,7 +244,7 @@ function DialogueContent() {
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-sm overflow-hidden relative">
                   {selectedPhilosopher.imageUrl ? (
-                    <img src={selectedPhilosopher.imageUrl} alt={philosopher.name} className="w-full h-full object-cover grayscale opacity-70" />
+                    <img src={selectedPhilosopher.imageUrl} alt={selectedPhilosopher.name} className="w-full h-full object-cover grayscale opacity-70" />
                   ) : (
                     <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
                       <span className="font-headline text-2xl text-zinc-600">{selectedPhilosopher.name.charAt(0)}</span>
@@ -355,7 +355,7 @@ export default function DialoguePage() {
           <span className="font-label text-primary text-xl opacity-20">_</span>
         </div>
       </div>
-    >
+    }>
       <DialogueContent />
     </Suspense>
   );

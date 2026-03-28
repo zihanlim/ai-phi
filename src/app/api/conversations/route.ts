@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform to match frontend expected shape
-    const transformed = conversations.map((conv) => ({
+    const transformed = conversations.map((conv: typeof conversations[number]) => ({
       id: conv.id,
       title: conv.title || "Untitled",
-      philosopherIds: conv.participants.map((p) => p.philosopherId),
-      philosopherNames: conv.participants.map((p) => p.philosopher.name),
+      philosopherIds: conv.participants.map((p: { philosopherId: string }) => p.philosopherId),
+      philosopherNames: conv.participants.map((p: { philosopher: { name: string } }) => p.philosopher.name),
       lastMessage: conv.messages[0]?.content || "",
       updatedAt: conv.updatedAt.toISOString(),
       type: conv.participants.length > 1 ? "debate" : "dialogue",

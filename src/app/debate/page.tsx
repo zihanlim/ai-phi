@@ -97,8 +97,8 @@ function DebateContent() {
           (response: { philosopherId: string; philosopherName: string; response: string }, idx: number) => ({
             id: `msg-${idx}`,
             philosopherId: response.philosopherId,
-            philosopherName: result.philosopherName,
-            content: result.response,
+            philosopherName: response.philosopherName,
+            content: response.response,
           })
         );
         setMessages(comparisonMessages);
