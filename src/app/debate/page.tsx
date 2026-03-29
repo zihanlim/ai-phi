@@ -196,20 +196,35 @@ function DebateContent() {
               <span className="font-label text-primary text-xl opacity-20">_</span>
             </div>
           ) : (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
               {philosophers.map((philosopher) => {
                 const isSelected = selectedPhilosophers.includes(philosopher.id);
                 return (
                   <button
                     key={philosopher.id}
                     onClick={() => togglePhilosopher(philosopher.id)}
-                    className={`px-4 py-2 rounded-sm font-label text-[10px] uppercase tracking-widest transition-all border ${
+                    className={`rounded-sm overflow-hidden group cursor-pointer transition-all border-2 ${
                       isSelected
-                        ? "bg-primary text-surface-container-lowest border-primary"
-                        : "bg-surface-container text-zinc-400 hover:text-on-surface border-outline-variant/30 hover:border-primary/30"
+                        ? "border-primary bg-primary/10"
+                        : "border-outline-variant/30 hover:border-primary/30"
                     }`}
                   >
-                    {philosopher.name}
+                    <div className="h-48 relative">
+                      {philosopher.imageUrl ? (
+                        <img src={philosopher.imageUrl} alt={philosopher.name}
+                          className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
+                      ) : (
+                        <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                          <span className="font-headline text-3xl text-zinc-600">{philosopher.name.charAt(0)}</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    </div>
+                    <div className="p-2 text-center">
+                      <p className={`font-label text-[9px] uppercase tracking-widest truncate ${isSelected ? "text-primary" : "text-zinc-400"}`}>
+                        {philosopher.name}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
@@ -233,12 +248,12 @@ function DebateContent() {
           )}
         </section>
 
-        {/* Question Input Section */}
-        <section className="p-6">
+        {/* Question Input Section - stays visible for follow-up questions */}
+        <section className="p-6 border-t border-outline-variant/20">
           <div className="flex items-center gap-2 mb-4">
             <span className="material-symbols-outlined text-secondary">help</span>
             <h2 className="font-headline text-lg uppercase tracking-widest">
-              Pose Your Question
+              {showResults ? "Ask Follow-up" : "Pose Your Question"}
             </h2>
           </div>
 
@@ -246,7 +261,7 @@ function DebateContent() {
             <textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="What philosophical question would you like to pose to these thinkers?"
+              placeholder={showResults ? "Continue the debate with a follow-up question..." : "What philosophical question would you like to pose to these thinkers?"}
               rows={3}
               className="w-full bg-surface-container border border-outline-variant/30 rounded-sm p-4 text-on-surface placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors resize-none font-body"
             />
@@ -266,7 +281,7 @@ function DebateContent() {
                 }`}
               >
                 <span className="material-symbols-outlined">send</span>
-                Pose Question
+                {showResults ? "Continue Debate" : "Pose Question"}
               </button>
             </div>
           </div>
@@ -293,7 +308,7 @@ function DebateContent() {
 
         {/* Results Section */}
         {showResults && messages.length > 0 && (
-          <section className="flex-1 p-6">
+          <section className="p-6 border-t border-outline-variant/20">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary">compare</span>
@@ -312,7 +327,7 @@ function DebateContent() {
                 New Debate
               </button>
             </div>
-            <div className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden h-[500px]">
+            <div className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden max-h-[400px]">
               <ComparisonView messages={messages} question={question || "Continuing conversation..."} philosopherImages={philosopherImages} />
             </div>
           </section>

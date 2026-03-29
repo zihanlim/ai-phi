@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import { prisma } from "@/lib/db";
 
 interface Philosopher {
   id: string;
@@ -9,14 +10,15 @@ interface Philosopher {
   bio: string;
   works: string[];
   ideas: string[];
-  imageUrl?: string;
+  imageUrl?: string | null;
 }
 
 async function getPhilosophers(): Promise<Philosopher[]> {
   try {
-    const res = await fetch(`/api/philosophers`, { cache: "no-store" });
-    if (!res.ok) return [];
-    return res.json();
+    return await prisma.philosopher.findMany({
+      orderBy: { name: "asc" },
+      take: 8,
+    });
   } catch {
     return [];
   }

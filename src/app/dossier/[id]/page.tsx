@@ -118,7 +118,7 @@ export default function PhilosopherDossierPage() {
         </div>
       </header>
 
-      <main className="pt-16 pb-32 min-h-screen">
+      <main className="pt-16 pb-40 md:pb-32 min-h-screen">
         <section className="relative w-full h-[397px] md:h-[530px] overflow-hidden bg-surface-container-lowest">
           {philosopher.imageUrl ? (
             <img
@@ -269,7 +269,7 @@ export default function PhilosopherDossierPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 w-full z-40 p-6 md:p-8 flex flex-col md:flex-row justify-center items-center gap-4 pointer-events-none">
+      <div className="fixed bottom-20 md:bottom-0 left-0 w-full z-40 p-6 md:p-8 flex flex-col md:flex-row justify-center items-center gap-4 pointer-events-none">
         <Link
           href={`/dialogue?philosopher=${philosopher.id}`}
           className="pointer-events-auto bg-primary text-surface-container-lowest px-8 py-4 rounded-sm font-headline font-bold text-lg uppercase tracking-[0.2em] flex items-center gap-3 hover:shadow-[0_0_30px_rgba(0,255,163,0.4)] transition-all active:scale-95 group"

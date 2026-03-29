@@ -171,31 +171,6 @@ function DialogueContent() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a]">
-        <div className="flex justify-between items-center px-6 h-16">
-          <div className="flex items-center gap-4">
-            {selectedPhilosopher ? (
-              <button onClick={handleBack} className="text-primary active:scale-95 transition-transform">
-                <span className="material-symbols-outlined">arrow_back</span>
-              </button>
-            ) : (
-              <span className="material-symbols-outlined text-primary">menu</span>
-            )}
-            <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl text-primary">
-              {selectedPhilosopher ? selectedPhilosopher.name : "Dialogue"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            {selectedPhilosopher && (
-              <span className="font-label text-[10px] text-secondary uppercase tracking-widest hidden md:block">
-                {selectedPhilosopher.tradition}
-              </span>
-            )}
-            <span className="material-symbols-outlined text-zinc-400">notifications</span>
-          </div>
-        </div>
-      </header>
-
       <main className="pt-16 pb-40 min-h-screen">
         {/* Philosopher Selector */}
         {showSelector && (
@@ -221,7 +196,7 @@ function DialogueContent() {
                     onClick={() => selectPhilosopher(philosopher)}
                     className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left"
                   >
-                    <div className="h-64 relative">
+                    <div className="h-96 relative">
                       {philosopher.imageUrl ? (
                         <img src={philosopher.imageUrl} alt={philosopher.name}
                           className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -316,7 +291,7 @@ function DialogueContent() {
 
       {/* Input — only shown when a philosopher is selected */}
       {!showSelector && selectedPhilosopher && (
-        <div className="fixed bottom-0 left-0 w-full z-40 bg-surface/95 backdrop-blur-xl border-t border-outline-variant">
+        <div className="fixed bottom-20 md:bottom-0 left-0 w-full z-[60] bg-surface/95 backdrop-blur-xl border-t border-outline-variant">
           <div className="max-w-3xl mx-auto px-6 py-4 flex gap-3">
             <textarea
               ref={textareaRef}
@@ -333,7 +308,7 @@ function DialogueContent() {
               }}
               placeholder={`Ask ${selectedPhilosopher.name}...`}
               rows={1}
-              className="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-sm px-4 py-3 text-on-surface placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors min-h-[48px] overflow-y-hidden"
+              className="flex-1 w-full bg-[#1a1a1a] border-2 border-zinc-600 rounded-sm px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:border-primary transition-colors min-h-[52px]"
               disabled={isLoading}
             />
             <button
