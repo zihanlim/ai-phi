@@ -42,10 +42,10 @@ export default async function HubPage() {
         </div>
 
         {philosophers.length === 0 ? (
-          <div className="px-6 flex gap-1 items-center">
-            <span className="font-label text-primary text-xl blinking-cursor">_</span>
-            <span className="font-label text-primary text-xl opacity-40">_</span>
-            <span className="font-label text-primary text-xl opacity-20">_</span>
+          <div className="px-6 py-8 text-center">
+            <p className="text-on-surface-variant text-sm">
+              No philosophers available. Please ensure the database is seeded and the API is running.
+            </p>
           </div>
         ) : (
           <div className="flex gap-4 overflow-x-auto px-6 hide-scrollbar">

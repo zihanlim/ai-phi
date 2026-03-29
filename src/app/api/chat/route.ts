@@ -41,17 +41,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate provider
+    if (provider && provider !== "openai" && provider !== "anthropic") {
+      return NextResponse.json(
+        { error: "Invalid provider. Must be 'openai' or 'anthropic'" },
+        { status: 400 }
+      );
+    }
+
     // If conversationId not provided, create a new conversation first
     let convId = conversationId;
+    let philosophers;
     if (!convId) {
-      const userIdToUse = userId || "anonymous";
-      const philosopherList = await prisma.philosopher.findMany({
+      const userIdToUse = userId || null;
+      philosophers = await prisma.philosopher.findMany({
         where: { id: { in: philosopherIds } },
-        select: { id: true, name: true },
       });
-      const title = philosopherList.length === 1
-        ? `Dialogue with ${philosopherList[0].name}`
-        : `Debate: ${philosopherList.map((p: { name: string }) => p.name).join(" vs ")}`;
+      const title = philosophers.length === 1
+        ? `Dialogue with ${philosophers[0].name}`
+        : `Debate: ${philosophers.map((p: { name: string }) => p.name).join(" vs ")}`;
       const conv = await prisma.conversation.create({
         data: {
           userId: userIdToUse,
@@ -65,11 +73,11 @@ export async function POST(request: NextRequest) {
         },
       });
       convId = conv.id;
+    } else {
+      philosophers = await prisma.philosopher.findMany({
+        where: { id: { in: philosopherIds } },
+      });
     }
-
-    const philosophers = await prisma.philosopher.findMany({
-      where: { id: { in: philosopherIds } },
-    });
 
     if (philosophers.length === 0) {
       return NextResponse.json(
@@ -90,18 +98,19 @@ export async function POST(request: NextRequest) {
 
     chatHistory.push({ role: "user", content: message });
 
+    // Save user message once (outside Promise.all to avoid duplicate saves)
+    await prisma.message.create({
+      data: {
+        conversationId: convId!,
+        role: "user",
+        content: message,
+      },
+    });
+
     const results = await Promise.all(
       philosophers.map(async (philosopher: { id: string; name: string; systemPrompt: string }) => {
         try {
           const response = await chat(chatHistory, philosopher.systemPrompt, provider);
-
-          await prisma.message.create({
-            data: {
-              conversationId: convId!,
-              role: "user",
-              content: message,
-            },
-          });
 
           await prisma.message.create({
             data: {

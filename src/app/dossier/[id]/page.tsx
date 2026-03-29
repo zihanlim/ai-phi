@@ -107,7 +107,7 @@ export default function PhilosopherDossierPage() {
             <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/archive">
               Archive
             </Link>
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/archive">
+            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/">
               Hub
             </Link>
             <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/settings">
@@ -298,7 +298,7 @@ export default function PhilosopherDossierPage() {
 
       <nav className="md:hidden bg-surface/80 backdrop-blur-xl border-t border-outline-variant fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-4 z-50">
         <Link
-          href="/archive"
+          href="/"
           className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
         >
           <span className="material-symbols-outlined">grid_view</span>

@@ -15,6 +15,7 @@ function getOpenAIClient(): OpenAI {
   if (!openaiClient) {
     openaiClient = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
+      baseURL: "https://api.minimax.io/v1",
     });
   }
   return openaiClient;
@@ -34,6 +35,13 @@ export async function chat(
   philosopherSystemPrompt: string,
   provider: AIProvider = "openai"
 ) {
+  if (provider === "anthropic" && !process.env.ANTHROPIC_API_KEY) {
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
+  }
+  if (provider === "openai" && !process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY environment variable is not set");
+  }
+
   const systemMessage = {
     role: "system" as const,
     content: philosopherSystemPrompt,
@@ -57,9 +65,14 @@ export async function chat(
 
   const client = getOpenAIClient();
   const response = await client.chat.completions.create({
-    model: "gpt-4o",
+    model: "MiniMax-M2.7",
     messages: [systemMessage, ...messages],
   });
 
-  return response.choices[0]?.message?.content ?? "";
+  let content = response.choices[0]?.message?.content ?? "";
+
+  // Strip thinking tags if present
+  content = content.replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
+
+  return content;
 }

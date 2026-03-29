@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, ChangeEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
@@ -35,6 +35,13 @@ function DialogueContent() {
   const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
   const [showSelector, setShowSelector] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoGrow = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const textarea = e.target;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -207,14 +214,14 @@ function DialogueContent() {
                 <span className="font-label text-primary text-xl opacity-20">_</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                 {philosophers.map((philosopher) => (
                   <button
                     key={philosopher.id}
                     onClick={() => selectPhilosopher(philosopher)}
                     className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left"
                   >
-                    <div className="h-32 relative">
+                    <div className="h-64 relative">
                       {philosopher.imageUrl ? (
                         <img src={philosopher.imageUrl} alt={philosopher.name}
                           className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -225,9 +232,9 @@ function DialogueContent() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent" />
                     </div>
-                    <div className="p-4">
-                      <p className="font-headline text-lg uppercase tracking-tight">{philosopher.name}</p>
-                      <p className="font-label text-[9px] text-zinc-500">{philosopher.era} · {philosopher.tradition}</p>
+                    <div className="p-3">
+                      <p className="font-headline text-sm uppercase tracking-tight">{philosopher.name}</p>
+                      <p className="font-label text-[8px] text-zinc-500">{philosopher.era} · {philosopher.tradition}</p>
                     </div>
                   </button>
                 ))}
@@ -312,8 +319,12 @@ function DialogueContent() {
         <div className="fixed bottom-0 left-0 w-full z-40 bg-surface/95 backdrop-blur-xl border-t border-outline-variant">
           <div className="max-w-3xl mx-auto px-6 py-4 flex gap-3">
             <textarea
+              ref={textareaRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                autoGrow(e);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -322,7 +333,7 @@ function DialogueContent() {
               }}
               placeholder={`Ask ${selectedPhilosopher.name}...`}
               rows={1}
-              className="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-sm px-4 py-3 text-on-surface placeholder:text-zinc-600 resize-none focus:outline-none focus:border-primary transition-colors"
+              className="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-sm px-4 py-3 text-on-surface placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors min-h-[48px] overflow-y-hidden"
               disabled={isLoading}
             />
             <button

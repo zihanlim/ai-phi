@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
 import "./globals.css";
+import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
@@ -34,35 +34,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen antialiased pb-20">
-        <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-headline font-bold tracking-widest text-primary uppercase">
-              DIGITAL AGORA
-            </h1>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors duration-200">
-              Hub
-            </Link>
-            <Link href="/debate" className="font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors duration-200">
-              Debate
-            </Link>
-            <Link href="/dialogue" className="font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors duration-200">
-              Dialogue
-            </Link>
-            <Link href="/dossier" className="font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors duration-200">
-              Dossiers
-            </Link>
-            <Link href="/archive" className="font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors duration-200">
-              Archive
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <span className="material-symbols-outlined text-zinc-400 hover:text-primary transition-colors duration-200 cursor-pointer">
-              notifications
-            </span>
-          </div>
-        </header>
+        <Header />
         {children}
         <Navigation />
       </body>

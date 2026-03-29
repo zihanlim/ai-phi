@@ -102,6 +102,9 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting conversation:", error);
+    if (error instanceof Error && error.name === "PrismaClientKnownRequestError" && (error as any).code === "P2025") {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -22,6 +22,7 @@ interface ComparisonMessage {
   philosopherId: string;
   philosopherName: string;
   content: string;
+  round?: number;
 }
 
 function DebateContent() {
@@ -30,6 +31,8 @@ function DebateContent() {
   const [selectedPhilosophers, setSelectedPhilosophers] = useState<string[]>([]);
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ComparisonMessage[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [currentRound, setCurrentRound] = useState(0);
   const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -69,6 +72,8 @@ function DebateContent() {
     });
     setShowResults(false);
     setMessages([]);
+    setConversationId(null);
+    setCurrentRound(0);
   };
 
   const handleSubmitQuestion = async () => {
@@ -76,7 +81,7 @@ function DebateContent() {
 
     setIsLoading(true);
     setShowResults(true);
-    setMessages([]);
+    const round = currentRound;
 
     try {
       const res = await fetch("/api/chat", {
@@ -85,6 +90,7 @@ function DebateContent() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          conversationId,
           philosopherIds: selectedPhilosophers,
           message: question,
         }),
@@ -92,49 +98,65 @@ function DebateContent() {
 
       if (res.ok) {
         const data = await res.json();
-        // Transform API response to ComparisonMessage format
-        const comparisonMessages: ComparisonMessage[] = data.results.map(
+        // Store conversation ID for follow-up questions
+        if (data.conversationId) {
+          setConversationId(data.conversationId);
+        }
+        // Transform API response to ComparisonMessage format with round
+        const newMessages: ComparisonMessage[] = data.results.map(
           (response: { philosopherId: string; philosopherName: string; response: string }, idx: number) => ({
-            id: `msg-${idx}`,
+            id: `msg-${Date.now()}-${idx}`,
             philosopherId: response.philosopherId,
             philosopherName: response.philosopherName,
             content: response.response,
+            round,
           })
         );
-        setMessages(comparisonMessages);
+        // Append new messages to existing ones
+        setMessages((prev) => [...prev, ...newMessages]);
+        setCurrentRound(round + 1);
       } else {
         // Fallback error message
         const errorMessages: ComparisonMessage[] = selectedPhilosophers.map((id, idx) => {
           const philosopher = philosophers.find((p) => p.id === id);
           return {
-            id: `error-${idx}`,
+            id: `error-${Date.now()}-${idx}`,
             philosopherId: id,
             philosopherName: philosopher?.name || "Unknown",
             content: "Unable to retrieve response. Please try again.",
+            round,
           };
         });
-        setMessages(errorMessages);
+        setMessages((prev) => [...prev, ...errorMessages]);
       }
     } catch (error) {
       console.error("Failed to submit question:", error);
       const errorMessages: ComparisonMessage[] = selectedPhilosophers.map((id, idx) => {
         const philosopher = philosophers.find((p) => p.id === id);
         return {
-          id: `error-${idx}`,
+          id: `error-${Date.now()}-${idx}`,
           philosopherId: id,
           philosopherName: philosopher?.name || "Unknown",
           content: "Network error. Please check your connection and try again.",
+          round,
         };
       });
-      setMessages(errorMessages);
+      setMessages((prev) => [...prev, ...errorMessages]);
     } finally {
       setIsLoading(false);
+      setQuestion("");
     }
   };
 
   const selectedPhilosopherData = philosophers.filter((p) =>
     selectedPhilosophers.includes(p.id)
   );
+
+  // Build image map for ComparisonView
+  const philosopherImages: Record<string, string> = {};
+  selectedPhilosopherData.forEach((p) => {
+    if (p.imageUrl) philosopherImages[p.id] = p.imageUrl;
+  });
 
   return (
     <>
@@ -272,14 +294,26 @@ function DebateContent() {
         {/* Results Section */}
         {showResults && messages.length > 0 && (
           <section className="flex-1 p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-secondary">compare</span>
-              <h2 className="font-headline text-lg uppercase tracking-widest">
-                Comparative Responses
-              </h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">compare</span>
+                <h2 className="font-headline text-lg uppercase tracking-widest">
+                  Comparative Responses
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  setMessages([]);
+                  setConversationId(null);
+                  setShowResults(false);
+                }}
+                className="px-4 py-2 rounded-sm font-label text-[10px] uppercase tracking-widest bg-surface-container border border-outline-variant/30 hover:border-primary/50 text-zinc-400 hover:text-primary transition-all"
+              >
+                New Debate
+              </button>
             </div>
             <div className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden h-[500px]">
-              <ComparisonView messages={messages} question={question} />
+              <ComparisonView messages={messages} question={question || "Continuing conversation..."} philosopherImages={philosopherImages} />
             </div>
           </section>
         )}
