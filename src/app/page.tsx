@@ -28,7 +28,8 @@ export default async function HubPage() {
   const philosophers = await getPhilosophers();
 
   return (
-    <main className="pt-20 pb-24 min-h-screen">
+    <>
+      <main className="pt-16 pb-24 min-h-screen">
       {/* Roster Section */}
       <section className="mb-10">
         <div className="px-6 flex justify-between items-end mb-4">
@@ -50,12 +51,12 @@ export default async function HubPage() {
             </p>
           </div>
         ) : (
-          <div className="flex gap-4 overflow-x-auto px-6 hide-scrollbar">
+          <div className="flex gap-4 overflow-x-auto px-6 hide-scrollbar snap-x snap-mandatory">
             {philosophers.slice(0, 8).map((philosopher) => (
               <Link
                 key={philosopher.id}
                 href={`/dossier/${philosopher.id}`}
-                className="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-sm hover:border-primary/40 transition-colors"
+                className="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-sm hover:border-primary/40 transition-colors snap-start"
               >
                 {philosopher.imageUrl ? (
                   <img
@@ -150,5 +151,6 @@ export default async function HubPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

@@ -120,12 +120,14 @@
 
 html {
   color-scheme: dark;
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--surface);
   color: var(--on-surface);
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
 .material-symbols-outlined {

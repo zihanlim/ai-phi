@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Header() {
+interface HeaderProps {
+  showBreadcrumbs?: boolean;
+  breadcrumbs?: { label: string; href?: string }[];
+}
+
+export function Header({ showBreadcrumbs = false, breadcrumbs = [] }: HeaderProps) {
   const pathname = usePathname();
 
   const getLinkClass = (href: string) => {
@@ -23,7 +28,7 @@ export function Header() {
           DIGITAL AGORA
         </h1>
       </div>
-      <nav className="flex items-center gap-6">
+      <nav className="hidden md:flex items-center gap-6">
         <Link href="/" className={getLinkClass("/")}>
           Hub
         </Link>
@@ -44,7 +49,10 @@ export function Header() {
         </Link>
       </nav>
       <div className="flex items-center gap-4">
-        <span className="material-symbols-outlined text-zinc-400 hover:text-primary transition-colors duration-200 cursor-pointer">
+        <span
+          className="material-symbols-outlined text-zinc-600 cursor-not-allowed"
+          title="Coming soon"
+        >
           notifications
         </span>
       </div>

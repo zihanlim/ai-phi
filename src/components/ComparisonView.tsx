@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface ComparisonMessage {
   id: string;
@@ -59,15 +60,15 @@ export function ComparisonView({ messages, question, philosopherImages = {} }: C
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       {question && (
-        <div className="p-4 border-b border-outline-variant bg-surface-container-low">
+        <div className="mb-4">
           <p className="text-sm text-on-surface-variant mb-1">Question posed to all:</p>
           <p className="font-medium text-on-surface">{question}</p>
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="space-y-6">
         {Object.entries(messagesByRound).map(([roundStr, roundMessages]) => {
           const round = parseInt(roundStr);
           const isExpanded = expandedRounds.has(round);
@@ -89,7 +90,15 @@ export function ComparisonView({ messages, question, philosopherImages = {} }: C
 
               {/* Messages Grid */}
               {isExpanded && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className={`grid gap-4 ${
+                  roundMessages.length === 1
+                    ? 'grid-cols-1'
+                    : roundMessages.length === 2
+                    ? 'grid-cols-1 lg:grid-cols-2'
+                    : roundMessages.length === 3
+                    ? 'grid-cols-1 md:grid-cols-3'
+                    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+                }`}>
                   {roundMessages.map((message) => (
                     <div
                       key={message.id}
@@ -123,9 +132,9 @@ export function ComparisonView({ messages, question, philosopherImages = {} }: C
                           {message.philosopherName}
                         </h3>
                       </div>
-                      <p className="text-on-surface-variant whitespace-pre-wrap">
-                        {message.content}
-                      </p>
+                      <div className="text-on-surface-variant prose prose-invert prose-sm max-w-none">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
                     </div>
                   ))}
                 </div>

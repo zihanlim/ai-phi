@@ -1,31 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
-
-type AIProvider = "openai" | "anthropic";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function SettingsPage() {
-  const [aiProvider, setAiProvider] = useState<AIProvider>("openai");
   const [displayName, setDisplayName] = useState("Anonymous");
-  const [isDarkMode] = useState(true); // App is always dark mode
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     // Load saved settings from localStorage
-    const savedProvider = localStorage.getItem("ai-phi-ai-provider") as AIProvider | null;
     const savedName = localStorage.getItem("ai-phi-display-name");
 
-    if (savedProvider) {
-      setAiProvider(savedProvider);
-    }
     if (savedName) {
       setDisplayName(savedName);
     }
   }, []);
 
   const handleSave = () => {
-    localStorage.setItem("ai-phi-ai-provider", aiProvider);
     localStorage.setItem("ai-phi-display-name", displayName);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -33,85 +24,14 @@ export default function SettingsPage() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-        <div className="flex items-center gap-4">
-          <span className="material-symbols-outlined text-primary active:scale-95 transition-transform cursor-pointer">
-            menu
-          </span>
-          <h1 className="text-2xl font-headline font-bold tracking-widest text-primary uppercase">
-            DIGITAL AGORA
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-label text-[10px] text-zinc-500 uppercase tracking-widest hidden md:block">
-            Settings
-          </span>
-          <span className="material-symbols-outlined text-zinc-400 hover:text-primary transition-colors duration-200 cursor-pointer">
-            notifications
-          </span>
-        </div>
-      </header>
-
       <main className="pt-16 pb-32 min-h-screen">
         <section className="p-6 max-w-2xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
+          <Breadcrumbs items={[{ label: "Settings" }]} />
+          <div className="flex items-center gap-3 mt-4 mb-8">
             <span className="material-symbols-outlined text-primary text-2xl">settings</span>
             <h2 className="font-headline text-3xl uppercase tracking-widest">
               Settings
             </h2>
-          </div>
-
-          {/* AI Provider Selection */}
-          <div className="mb-8">
-            <h3 className="font-label text-[10px] uppercase tracking-[0.2em] text-zinc-500 mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm">psychology</span>
-              AI Provider
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => setAiProvider("openai")}
-                className={`p-6 rounded-sm border transition-all text-left ${
-                  aiProvider === "openai"
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-surface-container border-outline-variant text-zinc-400 hover:border-primary/30"
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
-                    <span className="font-headline text-sm font-bold">O</span>
-                  </div>
-                  <div>
-                    <p className="font-headline uppercase tracking-tight">OpenAI</p>
-                    <p className="font-label text-[9px] text-zinc-500">GPT-4 Model</p>
-                  </div>
-                </div>
-                <p className="text-xs text-zinc-500">
-                  Advanced reasoning with GPT-4
-                </p>
-              </button>
-
-              <button
-                onClick={() => setAiProvider("anthropic")}
-                className={`p-6 rounded-sm border transition-all text-left ${
-                  aiProvider === "anthropic"
-                    ? "bg-primary/10 border-primary text-primary"
-                    : "bg-surface-container border-outline-variant text-zinc-400 hover:border-primary/30"
-                }`}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center">
-                    <span className="font-headline text-sm font-bold">A</span>
-                  </div>
-                  <div>
-                    <p className="font-headline uppercase tracking-tight">Anthropic</p>
-                    <p className="font-label text-[9px] text-zinc-500">Claude Model</p>
-                  </div>
-                </div>
-                <p className="text-xs text-zinc-500">
-                  Nuanced analysis with Claude
-                </p>
-              </button>
-            </div>
           </div>
 
           {/* User Display Name */}
@@ -209,7 +129,6 @@ export default function SettingsPage() {
         </section>
       </main>
 
-      <Navigation />
     </>
   );
 }

@@ -4,14 +4,18 @@ import { prisma } from "@/lib/db";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    const userIdParam = searchParams.get("userId");
 
-    if (!userId) {
+    // userId is required - "null" string means null userId for anonymous
+    if (userIdParam === null || userIdParam === "") {
       return NextResponse.json(
         { error: "userId is required" },
         { status: 400 }
       );
     }
+
+    // Handle "null" string as null userId for anonymous users
+    const userId = userIdParam === "null" ? null : userIdParam;
 
     const conversations = await prisma.conversation.findMany({
       where: { userId },
@@ -86,6 +90,30 @@ export async function POST(request: NextRequest) {
       { error: "Internal server error" },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, title } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "id required" }, { status: 400 });
+    }
+
+    const conversation = await prisma.conversation.update({
+      where: { id },
+      data: { title },
+    });
+
+    return NextResponse.json(conversation);
+  } catch (error) {
+    console.error("Error updating conversation:", error);
+    if (error instanceof Error && error.name === "PrismaClientKnownRequestError" && (error as any).code === "P2025") {
+      return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

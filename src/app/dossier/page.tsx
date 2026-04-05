@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { LoadingDots } from "@/components/LoadingDots";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface Philosopher {
   id: string;
@@ -45,59 +47,36 @@ export default function DossierPage() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-        <div className="flex items-center gap-4">
-          <button className="text-primary active:scale-95 transition-transform">
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-          <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
-            DIGITAL AGORA
-          </h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex gap-8 font-label text-[10px] uppercase tracking-widest">
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/">
-              Hub
-            </Link>
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/archive">
-              Archive
-            </Link>
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/settings">
-              Settings
-            </Link>
-          </nav>
-          <span className="material-symbols-outlined text-primary active:scale-95 transition-transform cursor-pointer">
-            notifications
-          </span>
-        </div>
-      </header>
 
-      <main className="pt-20 pb-24 min-h-screen">
+      <main className="pt-16 pb-24 min-h-screen">
         <section className="px-6 py-8">
           <div className="max-w-6xl mx-auto">
-            <div className="flex flex-wrap gap-2 mb-8">
-              {traditions.map((tradition) => (
-                <button
-                  key={tradition}
-                  onClick={() => setSelectedTradition(tradition)}
-                  className={`px-4 py-2 rounded-sm font-label text-[10px] uppercase tracking-widest transition-all ${
-                    selectedTradition === tradition
-                      ? "bg-primary text-surface-container-lowest"
-                      : "bg-surface-container text-zinc-400 hover:text-on-surface border border-outline-variant/30"
-                  }`}
-                >
-                  {tradition}
-                </button>
-              ))}
+            <Breadcrumbs items={[{ label: "Dossier" }]} />
+            <div className="flex flex-wrap gap-2 mb-8 mt-4">
+              {traditions.map((tradition) => {
+                const count = tradition === "All"
+                  ? philosophers.length
+                  : philosophers.filter((p) => p.tradition === tradition).length;
+                return (
+                  <button
+                    key={tradition}
+                    onClick={() => setSelectedTradition(tradition)}
+                    className={`px-4 py-3 min-h-[44px] rounded-sm font-label text-[10px] uppercase tracking-widest transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                      selectedTradition === tradition
+                        ? "bg-primary text-surface-container-lowest"
+                        : "bg-surface-container text-zinc-400 hover:text-on-surface border border-outline-variant/30"
+                    }`}
+                    aria-label={`Filter by ${tradition}`}
+                  >
+                    {tradition} ({count})
+                  </button>
+                );
+              })}
             </div>
 
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <div className="flex gap-1 items-center">
-                  <span className="font-label text-primary text-xl blinking-cursor">_</span>
-                  <span className="font-label text-primary text-xl opacity-40">_</span>
-                  <span className="font-label text-primary text-xl opacity-20">_</span>
-                </div>
+                <LoadingDots />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -142,6 +121,9 @@ export default function DossierPage() {
                         <p className="text-on-surface-variant text-sm mt-2 line-clamp-2">
                           {philosopher.bio}
                         </p>
+                        <button className="mt-2 font-label text-[10px] text-primary hover:underline uppercase tracking-widest">
+                          Read more
+                        </button>
                       </div>
                     </article>
                   </Link>
@@ -152,29 +134,6 @@ export default function DossierPage() {
         </section>
       </main>
 
-      <nav className="fixed bottom-0 left-0 w-full h-20 bg-surface/80 backdrop-blur-xl border-t border-outline-variant flex justify-around items-center px-4 pb-4 z-50">
-        <Link
-          href="/"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">grid_view</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Hub</span>
-        </Link>
-        <Link
-          href="/archive"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">history_edu</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Archive</span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Settings</span>
-        </Link>
-      </nav>
     </>
   );
 }

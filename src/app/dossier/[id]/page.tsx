@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { LoadingDots } from "@/components/LoadingDots";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { philosopherContent } from "@/lib/philosopher-content";
 
 interface Philosopher {
   id: string;
@@ -17,6 +20,7 @@ interface Philosopher {
 
 export default function PhilosopherDossierPage() {
   const params = useParams();
+  const router = useRouter();
   const [philosopher, setPhilosopher] = useState<Philosopher | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,23 +47,8 @@ export default function PhilosopherDossierPage() {
   if (loading) {
     return (
       <>
-        <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
-              <span className="material-symbols-outlined">menu</span>
-            </Link>
-            <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
-              DIGITAL AGORA
-            </h1>
-          </div>
-          <span className="material-symbols-outlined text-primary">notifications</span>
-        </header>
         <main className="pt-16 pb-32 min-h-screen flex items-center justify-center">
-          <div className="flex gap-1 items-center">
-            <span className="font-label text-primary text-xl blinking-cursor">_</span>
-            <span className="font-label text-primary text-xl opacity-40">_</span>
-            <span className="font-label text-primary text-xl opacity-20">_</span>
-          </div>
+          <LoadingDots />
         </main>
       </>
     );
@@ -68,21 +57,16 @@ export default function PhilosopherDossierPage() {
   if (!philosopher) {
     return (
       <>
-        <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
-              <span className="material-symbols-outlined">menu</span>
-            </Link>
-            <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
-              DIGITAL AGORA
-            </h1>
-          </div>
-          <span className="material-symbols-outlined text-primary">notifications</span>
-        </header>
         <main className="pt-16 pb-32 min-h-screen flex items-center justify-center">
           <div className="text-center">
+            <span className="material-symbols-outlined text-6xl text-zinc-600 mb-4 block">
+              search_off
+            </span>
             <h2 className="font-headline text-2xl text-primary mb-2">Philosopher not found</h2>
-            <Link href="/dossier" className="text-secondary hover:underline">
+            <p className="text-on-surface-variant text-sm mb-6">
+              The philosopher you are looking for does not exist or has been removed.
+            </p>
+            <Link href="/dossier" className="text-primary font-label text-[10px] uppercase tracking-widest hover:underline">
               ← Back to Dossiers
             </Link>
           </div>
@@ -91,32 +75,15 @@ export default function PhilosopherDossierPage() {
     );
   }
 
+  const content = philosopherContent[philosopher.id];
+  const tagline = content?.tagline || `The Philosophy of ${philosopher.name}`;
+  const workDescriptions = content?.workDescriptions || {};
+  const ideaDescriptions = content?.ideaDescriptions || {};
+  const quotes = content?.quotes || [];
+  const traditionContext = content?.traditionContext || "";
+
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
-        <div className="flex items-center gap-4">
-          <Link href="/dossier" className="text-primary active:scale-95 transition-transform">
-            <span className="material-symbols-outlined">menu</span>
-          </Link>
-          <h1 className="font-headline font-bold tracking-tighter uppercase text-2xl tracking-widest text-primary">
-            DIGITAL AGORA
-          </h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex gap-8 font-label text-[10px] uppercase tracking-widest">
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/archive">
-              Archive
-            </Link>
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/">
-              Hub
-            </Link>
-            <Link className="text-zinc-400 hover:text-primary transition-colors duration-200" href="/settings">
-              Settings
-            </Link>
-          </nav>
-          <span className="material-symbols-outlined text-primary">notifications</span>
-        </div>
-      </header>
 
       <main className="pt-16 pb-40 md:pb-32 min-h-screen">
         <section className="relative w-full h-[397px] md:h-[530px] overflow-hidden bg-surface-container-lowest">
@@ -134,8 +101,18 @@ export default function PhilosopherDossierPage() {
             </div>
           )}
           <div className="absolute inset-0 hero-gradient" />
+          <div className="absolute top-0 left-0 w-full px-6 pt-20 md:pt-24">
+            <button
+              onClick={() => router.push("/dossier")}
+              className="text-primary active:scale-95 transition-transform"
+              aria-label="Go back"
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+          </div>
           <div className="absolute bottom-0 left-0 w-full px-6 pb-12 md:px-12">
-            <div className="flex flex-col gap-2">
+            <Breadcrumbs items={[{ label: "Dossier", href: "/dossier" }, { label: philosopher.name }]} />
+            <div className="flex flex-col gap-2 mt-4">
               <span className="font-label text-primary text-sm tracking-[0.3em] font-bold">
                 {philosopher.era}
               </span>
@@ -147,6 +124,9 @@ export default function PhilosopherDossierPage() {
                   </span>
                 ))}
               </h2>
+              <p className="text-primary/80 text-sm md:text-base font-body italic mt-2 max-w-xl">
+                &ldquo;{tagline}&rdquo;
+              </p>
             </div>
           </div>
         </section>
@@ -190,17 +170,15 @@ export default function PhilosopherDossierPage() {
                 <span className="material-symbols-outlined text-9xl">psychology</span>
               </div>
               <h3 className="font-headline text-3xl font-bold mb-6 tracking-tight">
-                The Radical Questioning of Truth
+                {tagline}
               </h3>
               <div className="space-y-6 text-on-surface-variant leading-relaxed">
                 <p>{philosopher.bio}</p>
-                <p>
-                  Through the concept of the{" "}
-                  <span className="text-on-surface font-semibold">
-                    {philosopher.ideas[0] || "intellectual framework"}
-                  </span>
-                  , this thinker has shaped the course of philosophical inquiry for generations.
-                </p>
+                {traditionContext && (
+                  <p className="border-l-2 border-primary/30 pl-4 italic">
+                    {traditionContext}
+                  </p>
+                )}
               </div>
               <div className="mt-8 pt-8 border-t border-outline-variant/30 flex justify-between items-center">
                 <span className="font-label text-xs text-primary">SYNTHESIS COMPLETE</span>
@@ -226,6 +204,11 @@ export default function PhilosopherDossierPage() {
                       <h4 className="font-headline text-lg uppercase font-bold tracking-tight group-hover:text-primary transition-colors">
                         {work}
                       </h4>
+                      {workDescriptions[work] && (
+                        <p className="text-on-surface-variant text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {workDescriptions[work]}
+                        </p>
+                      )}
                     </div>
                     <span className="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all">
                       arrow_forward_ios
@@ -256,15 +239,38 @@ export default function PhilosopherDossierPage() {
                         <h4 className="font-headline text-lg uppercase tracking-tight text-on-surface mb-2">
                           {idea}
                         </h4>
-                        <p className="text-on-surface-variant text-sm leading-relaxed">
-                          A fundamental concept in {philosopher.name}&apos;s philosophical framework.
-                        </p>
+                        {ideaDescriptions[idea] && (
+                          <p className="text-on-surface-variant text-sm leading-relaxed">
+                            {ideaDescriptions[idea]}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            {quotes.length > 0 && (
+              <div>
+                <h3 className="font-headline text-2xl font-bold mb-8 flex items-center gap-3">
+                  <span className="w-8 h-[2px] bg-tertiary" />
+                  PHILOSOPHICAL REFLECTIONS
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {quotes.map((quote, i) => (
+                    <blockquote
+                      key={i}
+                      className="bg-surface-container border-l-4 border-tertiary p-6 rounded-sm"
+                    >
+                      <p className="text-on-surface-variant italic leading-relaxed">
+                        &ldquo;{quote}&rdquo;
+                      </p>
+                    </blockquote>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
@@ -296,29 +302,6 @@ export default function PhilosopherDossierPage() {
         </Link>
       </div>
 
-      <nav className="md:hidden bg-surface/80 backdrop-blur-xl border-t border-outline-variant fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-4 z-50">
-        <Link
-          href="/"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">grid_view</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Hub</span>
-        </Link>
-        <Link
-          href="/archive"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">history_edu</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Archive</span>
-        </Link>
-        <Link
-          href="/settings"
-          className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
-        >
-          <span className="material-symbols-outlined">settings</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest mt-1">Settings</span>
-        </Link>
-      </nav>
     </>
   );
 }

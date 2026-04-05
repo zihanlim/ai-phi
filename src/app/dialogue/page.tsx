@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense, ChangeEvent } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Navigation } from "@/components/Navigation";
+import { ChatInterface } from "@/components/ChatInterface";
+import { LoadingDots } from "@/components/LoadingDots";
 
 interface Philosopher {
   id: string;
@@ -29,27 +30,11 @@ function DialogueContent() {
   const [philosophers, setPhilosophers] = useState<Philosopher[]>([]);
   const [selectedPhilosopher, setSelectedPhilosopher] = useState<Philosopher | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string>("");
   const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
   const [showSelector, setShowSelector] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const autoGrow = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = e.target;
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const [lastUsedIds, setLastUsedIds] = useState<string[]>([]);
 
   // Handle pre-selected philosopher from query param
   useEffect(() => {
@@ -93,37 +78,54 @@ function DialogueContent() {
     fetchPhilosophers();
   }, []);
 
+  // Load last used philosophers from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("ai-phi-last-used-philosophers");
+    if (stored) {
+      try {
+        setLastUsedIds(JSON.parse(stored));
+      } catch {
+        console.error("Failed to parse last used philosophers");
+      }
+    }
+  }, []);
+
   const selectPhilosopher = (philosopher: Philosopher) => {
     setSelectedPhilosopher(philosopher);
     setShowSelector(false);
     setMessages([]);
     setConversationId("");
+
+    // Save to last used
+    const updatedLastUsed = [philosopher.id, ...lastUsedIds.filter(id => id !== philosopher.id)].slice(0, 5);
+    setLastUsedIds(updatedLastUsed);
+    localStorage.setItem("ai-phi-last-used-philosophers", JSON.stringify(updatedLastUsed));
   };
 
-  const handleSendMessage = async (text?: string) => {
-    const textToSend = text || inputValue;
-    if (!selectedPhilosopher || !textToSend.trim()) return;
+  const handleSendMessage = async (text: string) => {
+    if (!selectedPhilosopher || !text.trim()) return;
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: textToSend.trim(),
+      content: text.trim(),
       timestamp: "You",
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
     setIsLoading(true);
 
     try {
       const convIdToSend = conversationId || undefined;
+      const provider = localStorage.getItem("ai-phi-ai-provider") || "openai";
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           conversationId: convIdToSend,
           philosopherIds: [selectedPhilosopher.id],
-          message: textToSend.trim(),
+          message: text.trim(),
+          provider,
         }),
       });
 
@@ -150,6 +152,7 @@ function DialogueContent() {
         setMessages((prev) => [...prev, errMsg]);
       }
     } catch (error) {
+      console.error("Chat error:", error);
       const errMsg: Message = {
         id: `error-${Date.now()}`,
         role: "assistant",
@@ -162,12 +165,23 @@ function DialogueContent() {
     }
   };
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setShowSelector(true);
     setSelectedPhilosopher(null);
     setMessages([]);
     setConversationId("");
-  };
+  }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !showSelector && selectedPhilosopher) {
+        handleBack();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showSelector, selectedPhilosopher, handleBack]);
 
   return (
     <>
@@ -183,26 +197,60 @@ function DialogueContent() {
             </div>
 
             {loadingPhilosophers ? (
-              <div className="flex gap-1 items-center justify-center h-64">
-                <span className="font-label text-primary text-xl blinking-cursor">_</span>
-                <span className="font-label text-primary text-xl opacity-40">_</span>
-                <span className="font-label text-primary text-xl opacity-20">_</span>
+              <div className="flex items-center justify-center h-64">
+                <LoadingDots />
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                {philosophers.map((philosopher) => (
+              <>
+                {lastUsedIds.length > 0 && (
+                  <div className="mb-6">
+                    <p className="font-label text-[10px] text-zinc-500 uppercase tracking-widest mb-3">Last Used</p>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {lastUsedIds.map(id => {
+                        const p = philosophers.find(ph => ph.id === id);
+                        if (!p) return null;
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => selectPhilosopher(p)}
+                            className="flex-shrink-0 w-24 bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left focus:outline-none focus:ring-2 focus:ring-primary/30"
+                          >
+                            <div className="h-24 relative">
+                              {p.imageUrl ? (
+                                <img src={p.imageUrl} alt={p.name}
+                                  className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
+                              ) : (
+                                <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+                                  <span className="font-headline text-3xl text-zinc-600">{p.name.charAt(0)}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-2">
+                              <p className="font-headline text-xs uppercase tracking-tight">{p.name}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                  {philosophers
+                    .filter(p => !lastUsedIds.includes(p.id))
+                    .map((philosopher) => (
                   <button
                     key={philosopher.id}
                     onClick={() => selectPhilosopher(philosopher)}
-                    className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left"
+                    className="bg-surface-container border border-outline-variant/10 rounded-sm overflow-hidden group cursor-pointer hover:border-primary/30 transition-all text-left focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    aria-label={`Select ${philosopher.name}, ${philosopher.era} ${philosopher.tradition}`}
                   >
-                    <div className="h-96 relative">
+                    <div className="h-48 relative">
                       {philosopher.imageUrl ? (
                         <img src={philosopher.imageUrl} alt={philosopher.name}
                           className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
                       ) : (
                         <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
-                          <span className="font-headline text-5xl text-zinc-600">{philosopher.name.charAt(0)}</span>
+                          <span className="font-headline text-5xl text-zinc-600" aria-hidden="true">{philosopher.name.charAt(0)}</span>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent" />
@@ -212,8 +260,9 @@ function DialogueContent() {
                       <p className="font-label text-[8px] text-zinc-500">{philosopher.era} · {philosopher.tradition}</p>
                     </div>
                   </button>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}
@@ -248,85 +297,23 @@ function DialogueContent() {
               </div>
             </div>
 
-            {/* Messages */}
-            <div className="p-6 space-y-6">
-              {messages.length === 0 && (
-                <div className="text-center py-12">
-                  <span className="material-symbols-outlined text-5xl text-zinc-600 mb-3 block">chat</span>
-                  <p className="text-on-surface-variant text-sm max-w-sm mx-auto">
-                    Begin a dialogue with {selectedPhilosopher.name}. Ask about their ideas, works, or present a philosophical question.
-                  </p>
-                </div>
-              )}
-
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === "user" ? "items-end" : "items-start"}`}>
-                  {msg.timestamp && (
-                    <span className="font-label text-[9px] text-zinc-600 uppercase tracking-widest px-1">{msg.timestamp}</span>
-                  )}
-                  <div className={`max-w-[85%] rounded-sm p-4 ${msg.role === "user" ? "bg-primary/10 border border-primary/20" : "bg-surface-container border-l-2 border-primary"}`}>
-                    <p className="text-on-surface whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                </div>
-              ))}
-
-              {isLoading && (
-                <div className="flex flex-col gap-1 items-start">
-                  <span className="font-label text-[9px] text-zinc-600 uppercase tracking-widest px-1">
-                    {selectedPhilosopher.name} is thinking...
-                  </span>
-                  <div className="flex gap-1 px-1">
-                    <span className="font-label text-primary text-xl blinking-cursor">_</span>
-                    <span className="font-label text-primary text-xl opacity-40">_</span>
-                    <span className="font-label text-primary text-xl opacity-20">_</span>
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
+            {/* Chat Interface */}
+            <div className="h-[calc(100vh-18rem)]">
+              <ChatInterface
+                messages={messages.map((m) => ({
+                  ...m,
+                  philosopherName: m.timestamp && m.role === "assistant" ? m.timestamp : undefined,
+                }))}
+                onSendMessage={handleSendMessage}
+                disabled={isLoading}
+                philosopherName={selectedPhilosopher.name}
+                mode="dialogue"
+              />
             </div>
           </>
         )}
       </main>
 
-      {/* Input — only shown when a philosopher is selected */}
-      {!showSelector && selectedPhilosopher && (
-        <div className="fixed bottom-20 md:bottom-0 left-0 w-full z-[60] bg-surface/95 backdrop-blur-xl border-t border-outline-variant">
-          <div className="max-w-3xl mx-auto px-6 py-4 flex gap-3">
-            <textarea
-              ref={textareaRef}
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                autoGrow(e);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              placeholder={`Ask ${selectedPhilosopher.name}...`}
-              rows={1}
-              className="flex-1 w-full bg-[#1a1a1a] border-2 border-zinc-600 rounded-sm px-4 py-3 text-white placeholder:text-zinc-500 focus:outline-none focus:border-primary transition-colors min-h-[52px]"
-              disabled={isLoading}
-            />
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={isLoading || !inputValue.trim()}
-              className={`px-5 py-3 rounded-sm font-headline font-bold uppercase tracking-widest transition-all active:scale-95 ${
-                isLoading || !inputValue.trim()
-                  ? "bg-zinc-700 text-zinc-500 cursor-not-allowed"
-                  : "bg-primary text-surface-container-lowest hover:shadow-[0_0_20px_rgba(0,255,163,0.4)]"
-              }`}
-            >
-              <span className="material-symbols-outlined">send</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      <Navigation />
     </>
   );
 }
@@ -335,11 +322,7 @@ export default function DialoguePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="flex gap-1">
-          <span className="font-label text-primary text-xl blinking-cursor">_</span>
-          <span className="font-label text-primary text-xl opacity-40">_</span>
-          <span className="font-label text-primary text-xl opacity-20">_</span>
-        </div>
+        <LoadingDots />
       </div>
     }>
       <DialogueContent />
