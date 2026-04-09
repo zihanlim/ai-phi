@@ -101,7 +101,6 @@ export default function SettingsPage() {
                   <span className="material-symbols-outlined text-xs">open_in_new</span>
                 </a>
               </div>
-              <div className="h-px bg-outline-variant/20" />
               <div className="flex justify-between items-center">
                 <span className="font-label text-[10px] text-zinc-500 uppercase">Framework</span>
                 <span className="font-label text-[10px] text-on-surface">Next.js</span>
@@ -126,6 +125,11 @@ export default function SettingsPage() {
               </>
             )}
           </button>
+
+          {/* Credits */}
+          <p className="text-center text-xs text-zinc-500 mt-8">
+            Designed and created by zihanlim
+          </p>
         </section>
       </main>
 
