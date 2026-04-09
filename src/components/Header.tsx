@@ -21,8 +21,8 @@ export function Header({ showBreadcrumbs = false, breadcrumbs = [] }: HeaderProp
   return (
     <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
       <div className="flex items-center gap-4">
-        <Link href="/" className="text-primary">
-          <span className="material-symbols-outlined">menu</span>
+        <Link href="/" className="text-primary self-center">
+          <span className="material-symbols-outlined align-middle" style={{ fontSize: '30px' }}>blur_circular</span>
         </Link>
         <h1 className="text-2xl font-headline font-bold tracking-widest text-primary uppercase">
           DIGITAL AGORA
