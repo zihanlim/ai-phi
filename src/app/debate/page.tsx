@@ -346,7 +346,7 @@ function DebateContent() {
               <h3 className="font-headline text-xl text-zinc-400 mb-2">
                 The Arena Awaits
               </h3>
-              <p className="text-on-surface-variant text-sm max-w-md mb-6">
+              <p className="text-on-surface-variant text-sm max-w-md mx-auto mb-6 text-center">
                 Select at least one philosopher and pose a question to see their
                 perspectives compared side by side.
               </p>
