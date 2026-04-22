@@ -270,35 +270,65 @@ function DialogueContent() {
         {/* Chat View */}
         {!showSelector && selectedPhilosopher && (
           <>
-            {/* Philosopher context */}
-            <div className="p-6 border-b border-outline-variant/20">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-sm overflow-hidden relative">
+            {/* Philosopher context - Large header with background */}
+            <div className="relative h-48 overflow-hidden">
+              {/* Background image */}
+              {selectedPhilosopher.imageUrl ? (
+                <img
+                  src={selectedPhilosopher.imageUrl}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-surface-container to-surface" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent" />
+              
+              {/* Content */}
+              <div className="relative z-10 p-6 flex items-end gap-4 h-full">
+                <div className="w-20 h-20 rounded-sm overflow-hidden border-2 border-primary/30 shadow-lg">
                   {selectedPhilosopher.imageUrl ? (
-                    <img src={selectedPhilosopher.imageUrl} alt={selectedPhilosopher.name} className="w-full h-full object-cover grayscale opacity-70" />
+                    <img src={selectedPhilosopher.imageUrl} alt={selectedPhilosopher.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
-                      <span className="font-headline text-2xl text-zinc-600">{selectedPhilosopher.name.charAt(0)}</span>
+                      <span className="font-headline text-4xl text-zinc-600">{selectedPhilosopher.name.charAt(0)}</span>
                     </div>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 mb-1">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <span className="font-label text-[10px] text-primary uppercase tracking-widest">Active</span>
                   </div>
-                  <p className="font-headline text-lg">{selectedPhilosopher.name}</p>
-                  <p className="font-label text-[9px] text-zinc-500">{selectedPhilosopher.tradition}</p>
+                  <p className="font-headline text-2xl">{selectedPhilosopher.name}</p>
+                  <p className="font-label text-[9px] text-zinc-400">{selectedPhilosopher.era} · {selectedPhilosopher.tradition}</p>
                 </div>
                 <Link href={`/debate?philosopher=${selectedPhilosopher.id}`}
-                  className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary hover:border-primary/30 transition-all">
+                  className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary hover:border-primary/30 transition-all mb-1">
                   + Debate
                 </Link>
               </div>
             </div>
 
+            {/* Memories - past conversation snippets */}
+            {messages.length > 2 && (
+              <div className="px-6 py-3 border-b border-outline-variant/20 bg-surface-container/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="material-symbols-outlined text-sm text-primary">history</span>
+                  <p className="font-label text-[10px] text-zinc-500 uppercase tracking-widest">Memories</p>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {messages.slice(0, -1).filter(m => m.role === "user").slice(-3).map((msg, i) => (
+                    <div key={i} className="flex-shrink-0 px-3 py-2 bg-surface-container-high rounded-sm text-xs text-on-surface-variant max-w-[200px] truncate">
+                      You: {msg.content.slice(0, 50)}...
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Chat Interface */}
-            <div className="h-[calc(100vh-18rem)]">
+            <div className="flex-1 min-h-0">
               <ChatInterface
                 messages={messages.map((m) => ({
                   ...m,
@@ -307,6 +337,8 @@ function DialogueContent() {
                 onSendMessage={handleSendMessage}
                 disabled={isLoading}
                 philosopherName={selectedPhilosopher.name}
+                philosopherBio={selectedPhilosopher.bio}
+                showTypingIndicator={isLoading}
                 mode="dialogue"
               />
             </div>
