@@ -5,6 +5,27 @@ import Link from "next/link";
 import { LoadingDots } from "@/components/LoadingDots";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 
+// Category filters
+const categories = [
+  { id: "all", label: "All" },
+  { id: "philosophers", label: "Philosophers" },
+  { id: "macro", label: "Macro" },
+  { id: "risk", label: "Risk" },
+  { id: "value", label: "Value" },
+  { id: "quant", label: "Quant" },
+  { id: "behavioral", label: "Behavioral" },
+];
+
+// Category philosopher IDs
+const categoryPhilosophers: Record<string, string[]> = {
+  philosophers: ["socrates", "plato", "aristotle", "confucius", "lao-tzu", "nietzsche", "simone-de-beauvoir", "frantz-fanon", "wang-yangming"],
+  macro: ["ray-dalio", "stanley-druckenmiller", "jeff-gundlach"],
+  risk: ["nassim-taleb", "howard-marks"],
+  value: ["warren-buffett", "seth-klarman"],
+  quant: ["jim-simons", "david-shaw"],
+  behavioral: ["morgan-housel"],
+};
+
 interface Philosopher {
   id: string;
   name: string;
@@ -21,6 +42,7 @@ const traditions = ["All", "Western", "Eastern", "African", "Middle Eastern", "L
 export default function DossierPage() {
   const [philosophers, setPhilosophers] = useState<Philosopher[]>([]);
   const [selectedTradition, setSelectedTradition] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,10 +62,17 @@ export default function DossierPage() {
     fetchPhilosophers();
   }, []);
 
+  // Apply category filter first
+  const categoryFilteredPhilosophers =
+    activeCategory === "all"
+      ? philosophers
+      : philosophers.filter((p) => categoryPhilosophers[activeCategory]?.includes(p.id));
+
+  // Then apply tradition filter
   const filteredPhilosophers =
     selectedTradition === "All"
-      ? philosophers
-      : philosophers.filter((p) => p.tradition === selectedTradition);
+      ? categoryFilteredPhilosophers
+      : categoryFilteredPhilosophers.filter((p) => p.tradition === selectedTradition);
 
   return (
     <>
@@ -52,27 +81,59 @@ export default function DossierPage() {
         <section className="px-6 py-8">
           <div className="max-w-6xl mx-auto">
             <Breadcrumbs items={[{ label: "Dossier" }]} />
-            <div className="flex flex-wrap gap-2 mb-8 mt-4">
-              {traditions.map((tradition) => {
-                const count = tradition === "All"
-                  ? philosophers.length
-                  : philosophers.filter((p) => p.tradition === tradition).length;
+
+            {/* Category Filters */}
+            <div className="flex flex-wrap gap-2 mb-6 mt-4">
+              {categories.map((cat) => {
+                const philosopherIds = categoryPhilosophers[cat.id] || [];
+                const count = cat.id === "all" 
+                  ? philosophers.length 
+                  : philosophers.filter(p => philosopherIds.includes(p.id)).length;
                 return (
                   <button
-                    key={tradition}
-                    onClick={() => setSelectedTradition(tradition)}
-                    className={`px-4 py-3 min-h-[44px] rounded-sm font-label text-[10px] uppercase tracking-widest transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${
-                      selectedTradition === tradition
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      if (cat.id !== "philosophers") {
+                        setSelectedTradition("All");
+                      }
+                    }}
+                    className={`px-4 py-2 min-h-[40px] rounded-sm font-label text-[10px] uppercase tracking-widest transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+                      activeCategory === cat.id
                         ? "bg-primary text-surface-container-lowest"
-                        : "bg-surface-container text-zinc-400 hover:text-on-surface border border-outline-variant/30"
+                        : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
                     }`}
-                    aria-label={`Filter by ${tradition}`}
                   >
-                    {tradition} ({count})
+                    {cat.label} ({count})
                   </button>
                 );
               })}
             </div>
+
+            {/* Tradition Filters - Only show when Philosophers is selected */}
+            {activeCategory === "philosophers" && (
+              <div className="flex flex-wrap gap-1 mb-6 mt-3">
+                {traditions.map((tradition) => {
+                  const count = tradition === "All"
+                    ? categoryFilteredPhilosophers.length
+                    : categoryFilteredPhilosophers.filter((p) => p.tradition === tradition).length;
+                  return (
+                    <button
+                      key={tradition}
+                      onClick={() => setSelectedTradition(tradition)}
+                      className={`px-2 py-1 text-[9px] rounded-sm font-label uppercase tracking-widest transition-all focus:outline-none focus:ring-1 focus:ring-primary/30 ${
+                        selectedTradition === tradition
+                          ? "bg-primary text-surface-container-lowest"
+                          : "bg-surface-container text-zinc-400 hover:text-on-surface border border-outline-variant/30"
+                      }`}
+                      aria-label={`Filter by ${tradition}`}
+                    >
+                      {tradition} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {loading ? (
               <div className="flex justify-center items-center h-64">

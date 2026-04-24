@@ -32,11 +32,8 @@ export function Header({ showBreadcrumbs = false, breadcrumbs = [] }: HeaderProp
         <Link href="/" className={getLinkClass("/")}>
           Hub
         </Link>
-        <Link href="/debate" className={getLinkClass("/debate")}>
-          Debate
-        </Link>
-        <Link href="/dialogue" className={getLinkClass("/dialogue")}>
-          Dialogue
+        <Link href="/arena" className={getLinkClass("/arena")}>
+          Arena
         </Link>
         <Link href="/dossier" className={getLinkClass("/dossier")}>
           Dossier

@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Navigation } from "@/components/Navigation";
+import { SidePanelWrapper } from "@/components/SidePanelWrapper";
+import { Footer } from "@/components/Footer";
+import { prisma } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "AI-Phi | Digital Agora",
@@ -16,11 +19,23 @@ export const viewport: Viewport = {
   themeColor: "#0e0e10",
 };
 
-export default function RootLayout({
+async function getPhilosophers() {
+  try {
+    return await prisma.philosopher.findMany({
+      orderBy: { name: "asc" },
+    });
+  } catch {
+    return [];
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const philosophers = await getPhilosophers();
+
   return (
     <html lang="en" className="dark">
       <head>
@@ -33,9 +48,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen antialiased pb-20">
+      <body className="min-h-screen antialiased pb-20 flex flex-col">
         <Header />
-        {children}
+        <SidePanelWrapper philosophers={philosophers} />
+        <main className="flex-1">{children}</main>
+        <Footer />
         <Navigation />
       </body>
     </html>

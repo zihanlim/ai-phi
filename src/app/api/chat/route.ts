@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
     // If conversationId not provided, create a new conversation first
     let convId = conversationId;
     let philosophers;
+    
     if (!convId) {
       const userIdToUse = userId || null;
       philosophers = await prisma.philosopher.findMany({
@@ -112,14 +113,14 @@ export async function POST(request: NextRequest) {
         try {
           const response = await chat(chatHistory, philosopher.systemPrompt, provider);
 
-          await prisma.message.create({
+          const savedMsg = await prisma.message.create({
             data: {
               conversationId: convId!,
               role: "assistant",
               content: response,
             },
           });
-
+          
           return {
             conversationId: convId,
             philosopherId: philosopher.id,
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Chat error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }

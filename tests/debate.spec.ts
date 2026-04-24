@@ -43,7 +43,7 @@ test.describe("Debate Page", () => {
     await page.waitForSelector("text=The Arena Awaits", { timeout: 10000 });
 
     await expect(page.locator("text=The Arena Awaits")).toBeVisible();
-    await expect(page.locator("text=What is the meaning of life?")).toBeVisible();
+    await expect(page.locator("text=Leading Questions")).toBeVisible();
   });
 
   test("should use suggested question", async ({ page }) => {
@@ -54,10 +54,10 @@ test.describe("Debate Page", () => {
     await page.locator("button[aria-pressed]").filter({ hasText: "Socrates" }).click();
 
     // Click suggested question button
-    await page.locator("button", { hasText: "What is the meaning of life?" }).click();
+    await page.locator("button", { hasText: "What is the nature of virtue?" }).click();
 
     // Should populate textarea
-    await expect(page.locator("textarea")).toHaveValue("What is the meaning of life?");
+    await expect(page.locator("textarea")).toHaveValue("What is the nature of virtue and how can we cultivate it?");
   });
 
   test("pre-selected philosopher from query param", async ({ page }) => {

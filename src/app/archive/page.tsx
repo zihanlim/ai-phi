@@ -47,7 +47,16 @@ export default function ArchivePage() {
   }, []);
 
   const filteredConversations = useMemo(() => {
-    return conversations.filter((conv) => {
+    // Deduplicate by conversation ID first
+    const uniqueMap = new Map<string, Conversation>();
+    conversations.forEach((conv) => {
+      if (!uniqueMap.has(conv.id)) {
+        uniqueMap.set(conv.id, conv);
+      }
+    });
+    const uniqueConversations = Array.from(uniqueMap.values());
+    
+    return uniqueConversations.filter((conv) => {
       const matchesSearch =
         searchQuery === "" ||
         conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -274,9 +283,7 @@ export default function ArchivePage() {
                       <div className="flex flex-wrap gap-3">
                         <Link
                           href={
-                            conversation.type === "debate"
-                              ? `/debate?philosopher=${conversation.philosopherIds.join("&philosopher=")}`
-                              : `/dialogue?philosopher=${conversation.philosopherIds[0]}`
+                            `/arena?philosopher=${conversation.philosopherIds.join("&philosopher=")}`
                           }
                           className="px-4 py-2 bg-primary text-surface-container-lowest rounded-sm font-label text-[10px] uppercase tracking-widest hover:shadow-[0_0_15px_rgba(0,255,163,0.4)] transition-all"
                         >

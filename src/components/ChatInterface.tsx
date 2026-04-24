@@ -20,6 +20,8 @@ export interface ChatInterfaceProps {
   mode?: "dialogue" | "debate";
   philosopherBio?: string;
   showTypingIndicator?: boolean;
+  suggestedPrompts?: string[];
+  followUpSuggestions?: string[];
 }
 
 export function ChatInterface({
@@ -31,6 +33,8 @@ export function ChatInterface({
   mode = "debate",
   philosopherBio,
   showTypingIndicator = false,
+  suggestedPrompts = [],
+  followUpSuggestions = [],
 }: ChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -161,24 +165,19 @@ export function ChatInterface({
               Start a conversation with {philosopherName || "the philosopher"}
             </p>
             <div className="flex flex-col gap-2 max-w-md mx-auto">
-              <button
-                onClick={() => onSendMessage("What is the nature of reality?")}
-                className="px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-sm text-left text-sm text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all"
-              >
-                What is the nature of reality?
-              </button>
-              <button
-                onClick={() => onSendMessage("How should we live a good life?")}
-                className="px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-sm text-left text-sm text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all"
-              >
-                How should we live a good life?
-              </button>
-              <button
-                onClick={() => onSendMessage("What is the relationship between knowledge and virtue?")}
-                className="px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-sm text-left text-sm text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all"
-              >
-                What is the relationship between knowledge and virtue?
-              </button>
+              {(suggestedPrompts.length > 0 ? suggestedPrompts : [
+                "What is the nature of reality?",
+                "How should we live a good life?",
+                "What is the relationship between knowledge and virtue?",
+              ]).slice(0, 3).map((prompt, i) => (
+                <button
+                  key={i}
+                  onClick={() => onSendMessage(prompt)}
+                  className="px-4 py-3 bg-surface-container-high border border-outline-variant/30 rounded-sm text-left text-sm text-on-surface-variant hover:border-primary/30 hover:text-primary transition-all"
+                >
+                  {prompt}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -216,6 +215,11 @@ export function ChatInterface({
                           {playingId === message.id ? "stop" : "play_arrow"}
                         </span>
                       </button>
+                      {playingId === message.id && (
+                        <span className="text-[10px] text-zinc-500">
+                          {Math.ceil(message.content.split(/\s+/).length / 3)}″
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}
@@ -239,6 +243,22 @@ export function ChatInterface({
                   >
                     Show less
                   </button>
+                )}
+                {message.role === "assistant" && followUpSuggestions.length > 0 && !expandedMessages.has(message.id) && (
+                  <div className="mt-3 pt-2 border-t border-outline-variant/30">
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-2">Continue exploring</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {followUpSuggestions.slice(0, 3).map((suggestion, i) => (
+                        <button
+                          key={i}
+                          onClick={() => onSendMessage(suggestion)}
+                          className="px-2.5 py-1.5 text-xs bg-surface rounded-sm text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

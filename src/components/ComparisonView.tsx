@@ -9,6 +9,7 @@ interface ComparisonMessage {
   philosopherName: string;
   content: string;
   round?: number;
+  question?: string;
 }
 
 interface ComparisonViewProps {
@@ -72,6 +73,7 @@ export function ComparisonView({ messages, question, philosopherImages = {} }: C
         {Object.entries(messagesByRound).map(([roundStr, roundMessages]) => {
           const round = parseInt(roundStr);
           const isExpanded = expandedRounds.has(round);
+          const roundQuestion = roundMessages[0]?.question || (round === 0 ? question : "");
 
           return (
             <div key={roundStr}>
@@ -86,6 +88,11 @@ export function ComparisonView({ messages, question, philosopherImages = {} }: C
                 <span className="font-label text-[10px] uppercase tracking-widest text-secondary">
                   {round === 0 ? "Initial Question" : `Round ${round}`}
                 </span>
+                {roundQuestion && (
+                  <span className="text-zinc-500 text-xs truncate max-w-md">
+                    : {roundQuestion.length > 60 ? roundQuestion.slice(0, 60) + "..." : roundQuestion}
+                  </span>
+                )}
               </button>
 
               {/* Messages Grid */}

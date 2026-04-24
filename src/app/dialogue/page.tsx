@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, Suspense, useCallback } from "react";
+import { useState, useEffect, Suspense, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ChatInterface } from "@/components/ChatInterface";
 import { LoadingDots } from "@/components/LoadingDots";
+import { philosopherContent } from "@/lib/philosopher-content";
 
 interface Philosopher {
   id: string;
@@ -35,6 +36,10 @@ function DialogueContent() {
   const [loadingPhilosophers, setLoadingPhilosophers] = useState(true);
   const [showSelector, setShowSelector] = useState(true);
   const [lastUsedIds, setLastUsedIds] = useState<string[]>([]);
+  const [lastDiscussedMap, setLastDiscussedMap] = useState<Record<string, { topic: string; date: string }>>({});
+  const [conversationCountMap, setConversationCountMap] = useState<Record<string, number>>({});
+  const [lastMessageTopic, setLastMessageTopic] = useState<string>("");
+  const [philosopherConversationMap, setPhilosopherConversationMap] = useState<Record<string, string>>({});
 
   // Handle pre-selected philosopher from query param
   useEffect(() => {
@@ -49,6 +54,70 @@ function DialogueContent() {
             if (philosopher) {
               setSelectedPhilosopher(philosopher);
               setShowSelector(false);
+
+              // Try to find existing conversation in localStorage first
+              const convMapStored = localStorage.getItem("ai-phi-philosopher-conversations");
+              let existingConvId: string | null = null;
+              
+              if (convMapStored) {
+                try {
+                  const convMap = JSON.parse(convMapStored);
+                  existingConvId = convMap[philosopherId] || null;
+                } catch (e) {
+                  console.error("Failed to parse conversation map:", e);
+                }
+              }
+
+              // If no localStorage mapping, check with backend API for user's conversations
+              if (!existingConvId) {
+                try {
+                  const convRes = await fetch(`/api/conversations?userId=null&philosopherId=${philosopherId}`);
+                  if (convRes.ok) {
+                    const convData = await convRes.json();
+                    // Find the most recent conversation with this philosopher
+                    const matchingConv = convData.find((c: { philosopherIds: string[] }) => 
+                      c.philosopherIds.includes(philosopherId)
+                    );
+                    if (matchingConv) {
+                      existingConvId = matchingConv.id;
+                      // Update localStorage for future use
+                      const newConvMap = { ...(convMapStored ? JSON.parse(convMapStored) : {}) };
+                      newConvMap[philosopherId] = existingConvId;
+                      localStorage.setItem("ai-phi-philosopher-conversations", JSON.stringify(newConvMap));
+                    }
+                  }
+                } catch (e) {
+                  console.error("Failed to fetch conversation from API:", e);
+                }
+              }
+
+              // Load existing conversation if found
+              if (existingConvId) {
+                setConversationId(existingConvId);
+                try {
+                  const msgRes = await fetch(`/api/chat?conversationId=${existingConvId}`);
+                  if (msgRes.ok) {
+                    const existingMessages = await msgRes.json();
+                    const mappedMessages = existingMessages
+                      .filter((m: { role: string; content: string }) => m.role === "user" || m.role === "assistant")
+                      .map((m: { role: string; content: string }, idx: number) => ({
+                        id: `loaded-${idx}`,
+                        role: m.role as "user" | "assistant",
+                        content: m.content,
+                        timestamp: m.role === "user" ? "You" : philosopher.name,
+                      }));
+                    setMessages(mappedMessages);
+                    
+                    // Set last message topic from the last user message
+                    const lastUserMsg = [...mappedMessages].reverse().find((m: Message) => m.role === "user");
+                    if (lastUserMsg) {
+                      setLastMessageTopic(lastUserMsg.content);
+                    }
+                  }
+                } catch (e) {
+                  console.error("Failed to load messages:", e);
+                }
+              }
             }
           }
         } catch (error) {
@@ -88,13 +157,76 @@ function DialogueContent() {
         console.error("Failed to parse last used philosophers");
       }
     }
+    // Load conversation history
+    const historyStored = localStorage.getItem("ai-phi-conversation-history");
+    if (historyStored) {
+      try {
+        setLastDiscussedMap(JSON.parse(historyStored));
+      } catch {
+        console.error("Failed to parse conversation history");
+      }
+    }
+    // Load conversation counts
+    const countsStored = localStorage.getItem("ai-phi-conversation-counts");
+    if (countsStored) {
+      try {
+        setConversationCountMap(JSON.parse(countsStored));
+      } catch {
+        console.error("Failed to parse conversation counts");
+      }
+    }
+    // Load philosopher to conversation ID mapping
+    const convMapStored = localStorage.getItem("ai-phi-philosopher-conversations");
+    if (convMapStored) {
+      try {
+        setPhilosopherConversationMap(JSON.parse(convMapStored));
+      } catch {
+        console.error("Failed to parse philosopher conversation map");
+      }
+    }
   }, []);
 
-  const selectPhilosopher = (philosopher: Philosopher) => {
+  const selectPhilosopher = async (philosopher: Philosopher) => {
     setSelectedPhilosopher(philosopher);
     setShowSelector(false);
-    setMessages([]);
-    setConversationId("");
+    setLastMessageTopic("");
+
+    // Check if there's an existing conversation for this philosopher
+    const existingConvId = philosopherConversationMap[philosopher.id];
+    
+    if (existingConvId) {
+      // Load existing conversation from API
+      setConversationId(existingConvId);
+      try {
+        const res = await fetch(`/api/chat?conversationId=${existingConvId}`);
+        if (res.ok) {
+          const existingMessages = await res.json();
+          // Filter to only messages for this philosopher in dialogue mode (single philosopher)
+          const mappedMessages = existingMessages
+            .filter((m: { role: string; content: string }) => m.role === "user" || m.role === "assistant")
+            .map((m: { role: string; content: string; createdAt?: string }, idx: number) => ({
+              id: `loaded-${idx}`,
+              role: m.role as "user" | "assistant",
+              content: m.content,
+              timestamp: m.role === "user" ? "You" : philosopher.name,
+            }));
+          setMessages(mappedMessages);
+          
+          // Get the last user message as the topic
+          const lastUserMsg = [...mappedMessages].reverse().find((m: Message) => m.role === "user");
+          if (lastUserMsg) {
+            setLastMessageTopic(lastUserMsg.content);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load existing conversation:", error);
+        setMessages([]);
+        setConversationId("");
+      }
+    } else {
+      setMessages([]);
+      setConversationId("");
+    }
 
     // Save to last used
     const updatedLastUsed = [philosopher.id, ...lastUsedIds.filter(id => id !== philosopher.id)].slice(0, 5);
@@ -104,6 +236,9 @@ function DialogueContent() {
 
   const handleSendMessage = async (text: string) => {
     if (!selectedPhilosopher || !text.trim()) return;
+
+    // Track last message topic for this philosopher
+    setLastMessageTopic(text.trim());
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -131,7 +266,17 @@ function DialogueContent() {
 
       if (res.ok) {
         const data = await res.json();
-        if (data.conversationId) setConversationId(data.conversationId);
+        if (data.conversationId) {
+          setConversationId(data.conversationId);
+          
+          // Save philosopher -> conversationId mapping
+          const newConvMap = {
+            ...philosopherConversationMap,
+            [selectedPhilosopher.id]: data.conversationId,
+          };
+          setPhilosopherConversationMap(newConvMap);
+          localStorage.setItem("ai-phi-philosopher-conversations", JSON.stringify(newConvMap));
+        }
 
         for (const result of data.results || []) {
           const assistantMessage: Message = {
@@ -142,6 +287,24 @@ function DialogueContent() {
           };
           setMessages((prev) => [...prev, assistantMessage]);
         }
+
+        // Update conversation history and counts
+        const newHistory = {
+          ...lastDiscussedMap,
+          [selectedPhilosopher.id]: {
+            topic: text.trim().slice(0, 50),
+            date: new Date().toISOString(),
+          },
+        };
+        setLastDiscussedMap(newHistory);
+        localStorage.setItem("ai-phi-conversation-history", JSON.stringify(newHistory));
+
+        const newCounts = {
+          ...conversationCountMap,
+          [selectedPhilosopher.id]: (conversationCountMap[selectedPhilosopher.id] || 0) + 1,
+        };
+        setConversationCountMap(newCounts);
+        localStorage.setItem("ai-phi-conversation-counts", JSON.stringify(newCounts));
       } else {
         const errMsg: Message = {
           id: `error-${Date.now()}`,
@@ -268,7 +431,14 @@ function DialogueContent() {
         )}
 
         {/* Chat View */}
-        {!showSelector && selectedPhilosopher && (
+        {!showSelector && selectedPhilosopher && (() => {
+          const content = philosopherContent[selectedPhilosopher.id];
+          const suggestedPrompts = content?.suggestedPrompts?.slice(0, 3) || [];
+          const followUpSuggestions = content?.followUpSuggestions 
+            ? content.followUpSuggestions(lastMessageTopic || suggestedPrompts[0] || "")
+            : [];
+          
+          return (
           <>
             {/* Philosopher context - Large header with background */}
             <div className="relative h-48 overflow-hidden">
@@ -303,12 +473,24 @@ function DialogueContent() {
                   <p className="font-headline text-2xl">{selectedPhilosopher.name}</p>
                   <p className="font-label text-[9px] text-zinc-400">{selectedPhilosopher.era} · {selectedPhilosopher.tradition}</p>
                 </div>
-                <Link href={`/debate?philosopher=${selectedPhilosopher.id}`}
+                <Link href={`/arena?philosopher=${selectedPhilosopher.id}`}
                   className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm font-label text-[10px] uppercase tracking-widest text-zinc-400 hover:text-primary hover:border-primary/30 transition-all mb-1">
-                  + Debate
+                  + Compare
                 </Link>
               </div>
             </div>
+
+            {/* Context indicator for resumed conversations */}
+            {lastDiscussedMap[selectedPhilosopher.id] && messages.length === 0 && (
+              <div className="px-6 py-2 border-b border-outline-variant/20 bg-surface-container/50">
+                <div className="flex items-center gap-2 text-xs text-primary">
+                  <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                  <span>
+                    Resuming conversation about "{lastDiscussedMap[selectedPhilosopher.id].topic}"
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Memories - past conversation snippets */}
             {messages.length > 2 && (
@@ -340,10 +522,13 @@ function DialogueContent() {
                 philosopherBio={selectedPhilosopher.bio}
                 showTypingIndicator={isLoading}
                 mode="dialogue"
+                suggestedPrompts={suggestedPrompts}
+                followUpSuggestions={followUpSuggestions}
               />
             </div>
           </>
-        )}
+          );
+        })()}
       </main>
 
     </>

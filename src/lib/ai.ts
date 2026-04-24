@@ -42,6 +42,22 @@ export async function chat(
     throw new Error("OPENAI_API_KEY environment variable is not set");
   }
 
+  // Truncate message history to prevent API errors with long conversations
+  const MAX_MESSAGES = 20;
+  const MAX_TOTAL_CHARS = 40000;
+  
+  let truncatedMessages = messages;
+  if (messages.length > MAX_MESSAGES) {
+    truncatedMessages = messages.slice(-MAX_MESSAGES);
+  }
+  
+  // Also limit total characters
+  let totalChars = truncatedMessages.reduce((sum, m) => sum + m.content.length, 0);
+  while (totalChars > MAX_TOTAL_CHARS && truncatedMessages.length > 2) {
+    truncatedMessages = truncatedMessages.slice(1);
+    totalChars = truncatedMessages.reduce((sum, m) => sum + m.content.length, 0);
+  }
+
   const systemMessage = {
     role: "system" as const,
     content: philosopherSystemPrompt,
@@ -53,7 +69,7 @@ export async function chat(
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
       system: philosopherSystemPrompt,
-      messages: messages.map((m) => ({
+      messages: truncatedMessages.map((m) => ({
         role: m.role === "assistant" ? "assistant" : "user",
         content: m.content,
       })),
@@ -66,7 +82,7 @@ export async function chat(
   const client = getOpenAIClient();
   const response = await client.chat.completions.create({
     model: "MiniMax-M2.7",
-    messages: [systemMessage, ...messages],
+    messages: [systemMessage, ...truncatedMessages],
   });
 
   let content = response.choices[0]?.message?.content ?? "";

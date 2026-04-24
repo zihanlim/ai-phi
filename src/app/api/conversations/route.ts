@@ -5,6 +5,32 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const userIdParam = searchParams.get("userId");
+    const philosopherIdParam = searchParams.get("philosopherId");
+    const conversationIdParam = searchParams.get("conversationId");
+
+    // If conversationId is provided, return just that conversation
+    if (conversationIdParam) {
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationIdParam },
+        include: {
+          participants: {
+            include: { philosopher: true },
+            orderBy: { position: "asc" },
+          },
+        },
+      });
+      
+      if (!conversation) {
+        return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
+      }
+      
+      return NextResponse.json({
+        id: conversation.id,
+        title: conversation.title || "Untitled",
+        philosopherIds: conversation.participants.map((p) => p.philosopherId),
+        philosopherNames: conversation.participants.map((p) => p.philosopher.name),
+      });
+    }
 
     // userId is required - "null" string means null userId for anonymous
     if (userIdParam === null || userIdParam === "") {
@@ -17,8 +43,18 @@ export async function GET(request: NextRequest) {
     // Handle "null" string as null userId for anonymous users
     const userId = userIdParam === "null" ? null : userIdParam;
 
+    // Build where clause
+    let whereClause: any = { userId };
+    
+    // Filter by philosopher if provided
+    if (philosopherIdParam) {
+      whereClause.participants = {
+        some: { philosopherId: philosopherIdParam }
+      };
+    }
+
     const conversations = await prisma.conversation.findMany({
-      where: { userId },
+      where: whereClause,
       include: {
         participants: {
           include: { philosopher: true },
