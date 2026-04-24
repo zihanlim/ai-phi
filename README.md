@@ -1,25 +1,28 @@
 # AI-Phi: Digital Agora
 
-A web application for engaging in intellectual dialogue with historical and contemporary philosophers from diverse cultural traditions worldwide.
+A web application for engaging in intellectual dialogue with historical and contemporary thinkers - philosophers and financiers - from diverse cultural traditions worldwide.
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-cyan)
 ![Supabase](https://img.shields.io/badge/Supabase-Database-green)
 
 ## Features
 
-- **Debate Chamber** — Place multiple philosophers side-by-side and watch them debate on any topic
-- **Dialogue Interface** — Engage in deep, one-on-one conversations with individual philosophers
+- **Arena** — Unified interface combining Dialogue (1-on-1) and Debate (multi-thinker) modes
+- **Hub** — Central dashboard with drag-and-drop interface for selecting thinkers
+- **Thinker Categories** — Filter by Philosophers, Macro, Risk, Value, Quant, or Behavioral investors
 - **Philosopher Dossiers** — Explore biographies, major works, and key ideas from diverse traditions
+- **Dialogue Interface** — Engage in deep, one-on-one conversations with individual thinkers
+- **Debate Chamber** — Watch multiple thinkers debate on any topic
+- **Conversation Archive** — Save, search, pin, and revisit your philosophical dialogues
 - **Multi-Tradition Coverage** — Western, Eastern, African, Middle Eastern, Latin American, and Indigenous philosophies
-- **Conversation Archive** — Save and revisit your philosophical dialogues
 - **Multi-AI Provider Support** — Works with OpenAI or Anthropic APIs
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS 4 with custom design system
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS with custom design system
 - **Database**: PostgreSQL via Supabase
 - **ORM**: Prisma
 - **AI Integration**: OpenAI / Anthropic APIs
@@ -31,7 +34,7 @@ The neon-socratic design language features:
 
 - **Primary**: `#00FFA3` (neon cyan-green)
 - **Secondary**: `#699CFF` (intellectual agreement blue)
-- **Error**: `#EF4444` (paradox/fallacy red)
+- **Tertiary**: `#FF716A` (warm accent)
 - **Surface Hierarchy**: Deep abyss palette from `#000000` to `#1f1f22`
 - **Typography**: Space Grotesk (headlines), Plus Jakarta Sans (body), JetBrains Mono (labels)
 
@@ -87,7 +90,7 @@ npm install
 # Push database schema
 npm run db:push
 
-# Seed philosophers
+# Seed philosophers and financiers
 npm run db:seed
 
 # Start development server
@@ -101,34 +104,42 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 ```
 src/
 ├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Hub - Home/Dashboard
-│   ├── debate/            # Debate Chamber
-│   ├── dialogue/          # Dialogue Interface
-│   ├── dossier/           # Philosopher Dossiers
+│   ├── page.tsx           # Hub - Home/Dashboard with drag-and-drop
+│   ├── arena/             # Arena - Dialogue & Debate interface
+│   ├── dialogue/          # Dialogue Interface (single thinker)
+│   ├── debate/            # Debate Chamber (multi-thinker)
+│   ├── dossier/           # Thinker Dossiers
 │   │   └── [id]/          # Individual dossier pages
 │   ├── archive/           # Saved conversations
 │   ├── settings/          # App settings
 │   └── api/               # API routes
 │       ├── chat/          # AI chat endpoint
 │       ├── conversations/  # Conversation CRUD
-│       └── philosophers/   # Philosopher data
+│       └── philosophers/   # Thinker data
 ├── components/            # Reusable UI components
+│   ├── Header.tsx         # Top header bar
 │   ├── Navigation.tsx     # Bottom navigation bar
+│   ├── Footer.tsx        # Page footer with links
+│   ├── SidePanel.tsx      # Persistent archive/history sidebar
+│   ├── HubClient.tsx      # Hub page client component
 │   ├── PhilosopherCard.tsx
 │   ├── ChatInterface.tsx
 │   └── ComparisonView.tsx
 └── lib/                   # Utilities
     ├── ai.ts              # OpenAI/Anthropic clients
     ├── db.ts              # Prisma client
+    ├── philosopher-content.ts  # Extended content for thinkers
     └── supabase/          # Supabase helpers
-prototypes/                # Original HTML prototypes (reference)
 ```
 
-## Philosophers Included
+## Thinkers Included
+
+### Philosophers
 
 | Name | Era | Tradition |
 |------|-----|-----------|
 | Socrates | 470-399 BCE | Western |
+| Plato | 428-348 BCE | Western |
 | Aristotle | 384-322 BCE | Western |
 | Confucius | 551-479 BCE | Eastern |
 | Lao Tzu | 6th century BCE | Eastern |
@@ -137,13 +148,28 @@ prototypes/                # Original HTML prototypes (reference)
 | Simone de Beauvoir | 1908-1986 | Western |
 | Frantz Fanon | 1925-1961 | African |
 
+### Financiers
+
+| Name | Category | Strategy |
+|------|----------|----------|
+| Warren Buffett | Value | Long-term value investing |
+| Seth Klarman | Value | Deep value, activist investing |
+| Ray Dalio | Macro | All-weather, principle-based |
+| Stanley Druckenmiller | Macro | Global macro, currency trades |
+| Jeff Gundlach | Macro | Bonds, fixed income |
+| Nassim Taleb | Risk | Antifragility, tail risk |
+| Howard Marks | Risk | Second-level thinking |
+| Jim Simons | Quant | Mathematical trading systems |
+| David Shaw | Quant | Computational finance |
+| Morgan Housel | Behavioral | Psychology of money |
+
 ## API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/chat` | GET, POST | Fetch messages or send new chat |
-| `/api/conversations` | GET, POST, DELETE | List, create, or delete conversations |
-| `/api/philosophers` | GET | List all philosophers |
+| `/api/conversations` | GET, POST, DELETE, PATCH | List, create, delete, or rename conversations |
+| `/api/philosophers` | GET | List all thinkers |
 
 ## Scripts
 
@@ -153,8 +179,9 @@ npm run build     # Build for production
 npm run start     # Start production server
 npm run lint      # Run ESLint
 npm run db:push   # Push Prisma schema to database
-npm run db:seed   # Seed database with philosophers
+npm run db:seed   # Seed database with thinkers
 npm run db:studio # Open Prisma Studio
+npm run test      # Run Playwright tests
 ```
 
 ## Roadmap
@@ -163,25 +190,22 @@ npm run db:studio # Open Prisma Studio
 
 - [ ] **User Authentication** — Sign up/login via Supabase Auth
 - [ ] **User Profiles** — Save preferences and conversation history per user
-- [ ] **More Philosophers** — Expand to 20+ philosophers across all traditions
-  - Eastern: Sun Tzu, Mencius, Zhuangzi, Shankara, Nagarjuna
-  - Western: Plato, Kant, Kierkegaard, Sartre, Hannah Arendt
-  - African: Cheikh Anta Diop, Kwame Nkrumah
-  - Middle Eastern: Avicenna, Al-Ghazali, Averroes
-  - Latin American: Enrique Dussel, Rodolfo Kusch
-  - Indigenous: Chief Seattle, Vine Deloria Jr.
+- [ ] **More Thinkers** — Expand to include more philosophers and financiers
 - [ ] **Conversation Export** — Export dialogues as PDF or Markdown
-- [ ] **Philosopher Debate Mode** — AI-driven debates between selected philosophers
 - [ ] **Mobile App** — React Native companion app
 - [ ] **Rate Limiting** — Protect API endpoints from abuse
-- [ ] **Caching** — Redis caching for philosopher data
-- [ ] **Analytics Dashboard** — Track usage and popular philosophers
+- [ ] **Caching** — Redis caching for thinker data
+- [ ] **Analytics Dashboard** — Track usage and popular thinkers
 
 ### Known Limitations
 
 - Currently single-user mode (no auth)
 - Requires manual .env setup
 - API responses depend on AI provider quality/quotas
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
