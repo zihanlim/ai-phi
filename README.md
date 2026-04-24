@@ -233,15 +233,15 @@ erDiagram
     Conversation {
         string id PK
         string title
-        string type "dialogue" "debate"
-        string createdAt
+        string type
+        datetime createdAt
         datetime updatedAt
     }
 
     Message {
         string id PK
         string conversationId FK
-        string role "user" "assistant"
+        string role
         string content
         datetime createdAt
     }
