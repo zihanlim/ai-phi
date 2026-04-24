@@ -99,6 +99,156 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend (Next.js App Router)"]
+        Hub["Hub Page<br/>(/page.tsx)"]
+        Arena["Arena Page<br/>(/arena)"]
+        Dialogue["Dialogue Page<br/>(/dialogue)"]
+        Debate["Debate Page<br/>(/debate)"]
+        Dossier["Dossier Page<br/>(/dossier)"]
+        Archive["Archive Page<br/>(/archive)"]
+        Settings["Settings Page<br/>(/settings)"]
+    end
+
+    subgraph Components["Components"]
+        Header["Header"]
+        Navigation["Navigation"]
+        Footer["Footer"]
+        SidePanel["SidePanel"]
+        HubClient["HubClient"]
+        PhilosopherCard["PhilosopherCard"]
+        ChatInterface["ChatInterface"]
+        ComparisonView["ComparisonView"]
+    end
+
+    subgraph API["API Routes"]
+        ChatAPI["/api/chat"]
+        ConversationsAPI["/api/conversations"]
+        PhilosophersAPI["/api/philosophers"]
+    end
+
+    subgraph Backend["Backend Services"]
+        Prisma["Prisma ORM"]
+        AI["AI Client<br/>(OpenAI/Anthropic)"]
+    end
+
+    subgraph Database["Database (PostgreSQL)"]
+        PhilosopherTable["Philosopher"]
+        ConversationTable["Conversation"]
+        MessageTable["Message"]
+    end
+
+    subgraph External["External Services"]
+        Supabase["Supabase<br/>(Auth & Database)"]
+        OpenAI["OpenAI API"]
+        Anthropic["Anthropic API"]
+    end
+
+    Frontend --> Components
+    Components --> HubClient
+    HubClient --> SidePanel
+    
+    Hub --> Arena
+    Hub --> Dialogue
+    Hub --> Debate
+    Hub --> Dossier
+    
+    Dialogue --> ChatInterface
+    Debate --> ComparisonView
+    Debate --> ChatInterface
+    Dossier --> PhilosopherCard
+    
+    Archive --> SidePanel
+    Archive --> ChatInterface
+    
+    Dialogue --> API
+    Debate --> API
+    Arena --> API
+    
+    ChatAPI --> AI
+    ConversationsAPI --> Prisma
+    PhilosophersAPI --> Prisma
+    
+    Prisma --> Database
+    AI --> OpenAI
+    AI --> Anthropic
+    
+    Supabase --> Database
+```
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant Prisma
+    participant AI
+    participant External
+
+    User->>Frontend: Select Thinker(s)
+    User->>Frontend: Enter Topic/Question
+    
+    Frontend->>API: POST /api/chat
+    API->>AI: Send to AI Provider
+    AI->>External: OpenAI/Anthropic
+    
+    External-->>AI: AI Response
+    AI-->>API: Formatted Response
+    API-->>Frontend: JSON Response
+    
+    Frontend->>Prisma: Save Conversation
+    Prisma->>Database: Store in PostgreSQL
+    
+    User->>Frontend: Continue Conversation
+    Frontend->>API: GET /api/chat?conversationId=xxx
+    API->>Prisma: Fetch Messages
+    Prisma->>Database: Query Messages
+    Database-->>Prisma: Message History
+    Prisma-->>API: Messages
+    API-->>Frontend: Full Context
+    
+    Frontend-->>User: Display Response
+```
+
+## Data Model
+
+```mermaid
+erDiagram
+    Philosopher {
+        string id PK
+        string name
+        string era
+        string tradition
+        string bio
+        string[] works
+        string[] ideas
+        string systemPrompt
+        string imageUrl
+        datetime createdAt
+    }
+
+    Conversation {
+        string id PK
+        string title
+        string type "dialogue" "debate"
+        string createdAt
+        datetime updatedAt
+    }
+
+    Message {
+        string id PK
+        string conversationId FK
+        string role "user" "assistant"
+        string content
+        datetime createdAt
+    }
+
+    Conversation ||--o{ Message : "has"
+```
+
 ## Project Structure
 
 ```
