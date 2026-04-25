@@ -271,7 +271,7 @@ export function Footer() {
               Version 1.0.0
             </p>
             <p className="text-xs text-on-surface-variant">
-              Designed and Incepted by Lim Zi Han
+              Designed and Engineered by Lim Zi Han
             </p>
           </div>
           <p className="text-sm text-on-surface-variant">
