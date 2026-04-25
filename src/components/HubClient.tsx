@@ -127,9 +127,9 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
     if (droppedPhilosophers.length > 0) {
       const ids = droppedPhilosophers.map((p) => p.id).join(",");
       if (droppedPhilosophers.length === 1) {
-        router.push(`/dialogue?philosopher=${droppedPhilosophers[0].id}`);
+        router.push(`/arena?philosopher=${droppedPhilosophers[0].id}&mode=single`);
       } else {
-        router.push(`/debate?philosophers=${ids}`);
+        router.push(`/arena?philosophers=${ids}&mode=compare`);
       }
     }
   }, [droppedPhilosophers, router]);
@@ -372,14 +372,19 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                       key={p.id}
                       className="relative bg-surface border border-primary/30 rounded-sm overflow-hidden group flex-shrink-0"
                     >
-                      <div className="w-56 h-72 relative">
-                        {p.imageUrl ? (
-                          <img
-                            src={p.imageUrl}
-                            alt={p.name}
-                            className="w-full h-full object-cover object-top"
-                          />
-                        ) : (
+                      <div className="w-56 h-80 relative">
+                        {p.imageUrl ? (() => {
+                          const basePath = p.imageUrl.replace(/\/[^\/]+\.png$/, '');
+                          const fileName = p.imageUrl.split('/').pop()?.replace('.png', '_c.png') || '';
+                          const colorUrl = `${basePath}/color/${fileName}`;
+                          return (
+                            <img
+                              src={colorUrl}
+                              alt={p.name}
+                              className="w-full h-full object-cover object-top"
+                            />
+                          );
+                        })() : (
                           <div className="w-full h-full bg-surface-container flex items-center justify-center">
                             <span className="font-headline text-4xl text-zinc-600">
                               {p.name.charAt(0)}

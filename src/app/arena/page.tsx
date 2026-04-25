@@ -155,10 +155,25 @@ function ArenaContent() {
 
   // Handle pre-selected philosopher(s) from query param
   useEffect(() => {
-    const philosopherIds = searchParams.getAll("philosopher");
+    // Get philosopher IDs from either "philosopher" or "philosophers" param
+    const philosopherIdsFromSingle = searchParams.getAll("philosopher");
+    const philosopherIdsFromMultiple = searchParams.get("philosophers")?.split(",") || [];
+    const philosopherIds = philosopherIdsFromSingle.length > 0 ? philosopherIdsFromSingle : philosopherIdsFromMultiple;
+    
+    // Get mode from query param
+    const modeParam = searchParams.get("mode");
+    
     if (philosopherIds.length > 0) {
-      // Determine mode based on number of philosophers
-      const targetMode: Mode = philosopherIds.length > 1 ? "compare" : "single";
+      // Determine mode based on param or number of philosophers
+      let targetMode: Mode = "compare";
+      if (modeParam === "single") {
+        targetMode = "single";
+      } else if (modeParam === "compare") {
+        targetMode = "compare";
+      } else {
+        targetMode = philosopherIds.length > 1 ? "compare" : "single";
+      }
+      setMode(targetMode);
 
       if (philosophers.length === 0) {
         fetch("/api/philosophers")
