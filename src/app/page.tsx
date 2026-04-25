@@ -26,7 +26,7 @@ export default async function HubPage() {
   const philosophers = await getPhilosophers();
 
   return (
-    <main className="pt-16 pb-24 min-h-screen">
+    <main className="pt-16 pb-24">
       <DragHubClient philosophers={philosophers} />
     </main>
   );

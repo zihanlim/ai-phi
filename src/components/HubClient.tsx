@@ -32,7 +32,17 @@ const categories = [
 
 // Category philosopher IDs
 const categoryPhilosophers: Record<string, string[]> = {
-  philosophers: ["socrates", "plato", "aristotle", "confucius", "lao-tzu", "nietzsche", "simone-de-beauvoir", "frantz-fanon", "wang-yangming"],
+  philosophers: [
+    "socrates",
+    "plato",
+    "aristotle",
+    "confucius",
+    "lao-tzu",
+    "nietzsche",
+    "simone-de-beauvoir",
+    "frantz-fanon",
+    "wang-yangming",
+  ],
   macro: ["ray-dalio", "stanley-druckenmiller", "jeff-gundlach"],
   risk: ["nassim-taleb", "howard-marks"],
   value: ["warren-buffett", "seth-klarman"],
@@ -42,42 +52,48 @@ const categoryPhilosophers: Record<string, string[]> = {
 
 export function DragHubClient({ philosophers }: DragHubClientProps) {
   const router = useRouter();
-  const [droppedPhilosophers, setDroppedPhilosophers] = useState<Philosopher[]>([]);
+  const [droppedPhilosophers, setDroppedPhilosophers] = useState<Philosopher[]>(
+    [],
+  );
   const [isDragOver, setIsDragOver] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleDragStart = useCallback((e: React.DragEvent, philosopher: Philosopher) => {
-    e.dataTransfer.setData("application/json", JSON.stringify(philosopher));
-    e.dataTransfer.effectAllowed = "copy";
-    
-    const dragImage = document.createElement("div");
-    dragImage.className = "w-24 h-32 bg-surface border-2 border-primary rounded-sm overflow-hidden flex flex-col shadow-xl relative";
-    
-    if (philosopher.imageUrl) {
-      dragImage.innerHTML = `
+  const handleDragStart = useCallback(
+    (e: React.DragEvent, philosopher: Philosopher) => {
+      e.dataTransfer.setData("application/json", JSON.stringify(philosopher));
+      e.dataTransfer.effectAllowed = "copy";
+
+      const dragImage = document.createElement("div");
+      dragImage.className =
+        "w-24 h-32 bg-surface border-2 border-primary rounded-sm overflow-hidden flex flex-col shadow-xl relative";
+
+      if (philosopher.imageUrl) {
+        dragImage.innerHTML = `
         <img src="${philosopher.imageUrl}" class="w-full h-full object-cover object-top" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
         <p class="absolute bottom-0 w-full px-2 pb-1 font-label text-[10px] text-white text-center">${philosopher.name.split(" ")[0]}</p>
       `;
-    } else {
-      dragImage.innerHTML = `
+      } else {
+        dragImage.innerHTML = `
         <div class="w-full h-20 bg-surface-container flex items-center justify-center">
           <span class="font-headline text-3xl text-zinc-600">${philosopher.name.charAt(0)}</span>
         </div>
         <p class="p-2 font-label text-[10px] text-white text-center">${philosopher.name.split(" ")[0]}</p>
       `;
-    }
-    
-    dragImage.style.position = "absolute";
-    dragImage.style.top = "-1000px";
-    document.body.appendChild(dragImage);
-    e.dataTransfer.setDragImage(dragImage, 48, 64);
-    
-    setTimeout(() => {
-      document.body.removeChild(dragImage);
-    }, 0);
-  }, []);
+      }
+
+      dragImage.style.position = "absolute";
+      dragImage.style.top = "-1000px";
+      document.body.appendChild(dragImage);
+      e.dataTransfer.setDragImage(dragImage, 48, 64);
+
+      setTimeout(() => {
+        document.body.removeChild(dragImage);
+      }, 0);
+    },
+    [],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -92,11 +108,11 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     try {
       const data = e.dataTransfer.getData("application/json");
       const philosopher = JSON.parse(data) as Philosopher;
-      
+
       setDroppedPhilosophers((prev) => {
         const exists = prev.some((p) => p.id === philosopher.id);
         if (exists) return prev;
@@ -135,15 +151,22 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
           <div className="bg-gradient-to-r from-[#00aa66]/15 to-[#4477cc]/15 border border-outline-variant/20 rounded-2xl p-6 overflow-hidden relative">
             {/* Background Image */}
             <div className="absolute right-0 top-0 bottom-0 w-1/2 max-w-[500px] hidden md:block">
-              <img 
-                src="/banner/banner.png" 
-                alt="" 
+              <img
+                src="/banner/banner.png"
+                alt=""
                 className="w-full h-full object-cover object-right"
               />
             </div>
             {/* Banner Header */}
             <div className="mb-4 relative z-10">
-              <h3 className="font-headline text-[31px] leading-tight text-on-surface" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", fontWeight: 700 }}>
+              <h3
+                className="font-headline text-[31px] leading-tight text-on-surface"
+                style={{
+                  fontFamily:
+                    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  fontWeight: 700,
+                }}
+              >
                 Chat with Thinkers, Anytime, Anywhere.
               </h3>
               <p className="text-sm text-on-surface-variant mt-1">
@@ -152,26 +175,30 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
             </div>
             {/* Search Input */}
             <div className="relative z-10">
-              <div className="bg-surface rounded-full px-4 py-3 flex items-center gap-3 w-[325px] relative">
-                <span className="material-symbols-outlined text-zinc-500 text-xl shrink-0">search</span>
+              <div className="bg-surface rounded-full px-4 py-3 flex items-center gap-3 w-[325px] relative overflow-hidden">
+                <span className="material-symbols-outlined text-zinc-500 text-xl shrink-0">
+                  search
+                </span>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search thinkers..."
-                  className="w-full bg-transparent text-sm text-on-surface placeholder:text-zinc-500 focus:outline-none"
+                  className="w-full bg-transparent text-sm text-on-surface placeholder:text-zinc-500 focus:outline-none rounded-full"
                 />
                 {searchQuery ? (
                   <button
                     onClick={() => setSearchQuery("")}
                     className="text-zinc-500 hover:text-zinc-300 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-lg">close</span>
+                    <span className="material-symbols-outlined text-lg">
+                      close
+                    </span>
                   </button>
                 ) : (
-                  <img 
-                    src="https://cdn.talkie-ai.com/public-cdn-s3-us-west-2/talkie-op-img/image/1125577335_1725335062419_send.png" 
-                    alt="Search" 
+                  <img
+                    src="https://cdn.talkie-ai.com/public-cdn-s3-us-west-2/talkie-op-img/image/1125577335_1725335062419_send.png"
+                    alt="Search"
                     className="w-5 h-5 cursor-pointer opacity-70 hover:opacity-100 transition-opacity"
                   />
                 )}
@@ -224,7 +251,7 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                   p.name.toLowerCase().includes(query) ||
                   p.era.toLowerCase().includes(query) ||
                   p.tradition.toLowerCase().includes(query) ||
-                  p.ideas.some(idea => idea.toLowerCase().includes(query))
+                  p.ideas.some((idea) => idea.toLowerCase().includes(query))
                 );
               }
               return true;
@@ -255,7 +282,8 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                   )}
                   {(() => {
                     if (!philosopher.imageUrl) return null;
-                    const match = philosopher.imageUrl.match(/^(.+\/)([^/]+)\.png$/);
+                    const match =
+                      philosopher.imageUrl.match(/^(.+\/)([^/]+)\.png$/);
                     if (match) {
                       const [, dir, name] = match;
                       return (
@@ -278,7 +306,9 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                     </p>
                   </div>
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="material-symbols-outlined text-xs text-white/50">drag_indicator</span>
+                    <span className="material-symbols-outlined text-xs text-white/50">
+                      drag_indicator
+                    </span>
                   </div>
                 </Link>
               </div>
@@ -287,20 +317,21 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
       </section>
 
       {/* Arena Drop Zone */}
-      <section 
+      <section
         className="px-6"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div 
+        <div
           className={`
             relative border-2 border-dashed rounded-sm transition-all min-h-[320px]
-            ${isDragOver 
-              ? "border-primary bg-primary/5" 
-              : droppedPhilosophers.length > 0 
-                ? "border-primary/50 bg-surface-container" 
-                : "border-outline-variant/30 bg-surface-container/50"
+            ${
+              isDragOver
+                ? "border-primary bg-primary/5"
+                : droppedPhilosophers.length > 0
+                  ? "border-primary/50 bg-surface-container"
+                  : "border-outline-variant/30 bg-surface-container/50"
             }
           `}
         >
@@ -323,7 +354,9 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
               <>
                 <div className="flex items-center justify-between mb-3">
                   <p className="font-label text-[10px] text-primary uppercase tracking-widest">
-                    {droppedPhilosophers.length === 1 ? "1 Thinker Selected" : `${droppedPhilosophers.length} Thinkers Selected`}
+                    {droppedPhilosophers.length === 1
+                      ? "1 Thinker Selected"
+                      : `${droppedPhilosophers.length} Thinkers Selected`}
                   </p>
                   <button
                     onClick={clearDropped}
@@ -332,7 +365,7 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                     Clear
                   </button>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-6 justify-center">
                   {droppedPhilosophers.map((p) => (
                     <div
@@ -369,7 +402,9 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                           }}
                           className="absolute top-2 right-2 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <span className="material-symbols-outlined text-xs text-white">close</span>
+                          <span className="material-symbols-outlined text-xs text-white">
+                            close
+                          </span>
                         </button>
                       </div>
                     </div>
@@ -381,13 +416,16 @@ export function DragHubClient({ philosophers }: DragHubClientProps) {
                     onClick={handleDropZoneClick}
                     className={`
                       px-8 py-4 rounded-sm font-headline font-bold text-lg uppercase tracking-[0.2em] transition-all active:scale-95
-                      ${droppedPhilosophers.length === 1
-                        ? "bg-primary text-surface-container-lowest hover:shadow-[0_0_30px_rgba(0,255,163,0.4)]"
-                        : "bg-secondary text-surface-container-lowest hover:shadow-[0_0_30px_rgba(105,156,255,0.4)]"
+                      ${
+                        droppedPhilosophers.length === 1
+                          ? "bg-primary text-surface-container-lowest hover:shadow-[0_0_30px_rgba(0,255,163,0.4)]"
+                          : "bg-secondary text-surface-container-lowest hover:shadow-[0_0_30px_rgba(105,156,255,0.4)]"
                       }
                     `}
                   >
-                    {droppedPhilosophers.length === 1 ? "Start Dialogue" : "Start Debate"}
+                    {droppedPhilosophers.length === 1
+                      ? "Start Dialogue"
+                      : "Start Debate"}
                   </button>
                 </div>
               </>

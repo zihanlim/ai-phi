@@ -48,7 +48,7 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen antialiased pb-20 flex flex-col">
+      <body className="min-h-screen antialiased flex flex-col">
         <Header />
         <SidePanelWrapper philosophers={philosophers} />
         <main className="flex-1">{children}</main>
