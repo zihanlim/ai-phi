@@ -1221,19 +1221,19 @@ function ArenaContent() {
                   : "Select thinkers and pose a question to see their perspectives."}
               </p>
               <div className="flex flex-col gap-2 items-center">
-                <p className="font-label text-[10px] text-zinc-500 uppercase tracking-widest">
-                  Leading Questions
+                <p className="font-label text-[10px] text-primary uppercase tracking-widest mb-3">
+                  Philosophical Questions
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {[
-                    "What is the nature of virtue?",
-                    "How should we balance freedom with responsibility?",
-                    "Is there objective truth or is everything relative?",
                     "What role should emotion play in decisions?",
-                    "How can we live meaningfully without inherent purpose?",
+                    "Is consciousness fundamental or emergent?",
+                    "What is the nature of time?",
+                    "Can we have free will in a deterministic universe?",
+                    "What constitutes personal identity over time?",
                   ].map((q, i) => (
                     <button
-                      key={i}
+                      key={`phil-${i}`}
                       onClick={() => {
                         if (selectedPhilosophers.length > 0) {
                           setQuestion(q);
@@ -1246,7 +1246,42 @@ function ArenaContent() {
                           : "text-zinc-600 cursor-not-allowed"
                       }`}
                     >
-                      {q.length > 30 ? q.slice(0, 30) + "..." : q}
+                      {q.length > 35 ? q.slice(0, 35) + "..." : q}
+                    </button>
+                  ))}
+                </div>
+                <div className="w-full border-t border-outline-variant/30 my-4" />
+                <p className="font-label text-[10px] text-secondary uppercase tracking-widest mb-3">
+                  Finance &amp; Risk
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {[
+                    "What drives market cycles and regime changes?",
+                    "How do narratives shape financial decisions?",
+                    "How should we position for inflation or deflation?",
+                    "What is the role of liquidity in portfolio construction?",
+                    "How do we think about tail risk and black swan events?",
+                    "What is the relationship between leverage and fragility?",
+                    "How should we think about correlation across assets?",
+                    "What drives currency movements and geopolitical shifts?",
+                    "How do we identify bubbles before they burst?",
+                    "What is the role of central bank policy in markets?",
+                  ].map((q, i) => (
+                    <button
+                      key={`fin-${i}`}
+                      onClick={() => {
+                        if (selectedPhilosophers.length > 0) {
+                          setQuestion(q);
+                        }
+                      }}
+                      disabled={selectedPhilosophers.length === 0}
+                      className={`px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs transition-all ${
+                        selectedPhilosophers.length > 0
+                          ? "text-zinc-400 hover:text-secondary hover:border-secondary/30"
+                          : "text-zinc-600 cursor-not-allowed"
+                      }`}
+                    >
+                      {q.length > 35 ? q.slice(0, 35) + "..." : q}
                     </button>
                   ))}
                 </div>

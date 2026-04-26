@@ -834,67 +834,135 @@ function DebateContent() {
                 perspectives compared side by side.
               </p>
               <div className="flex flex-col gap-2 items-center">
-                <p className="font-label text-[10px] text-zinc-500 uppercase tracking-widest">
-                  Leading Questions
+                <p className="font-label text-[10px] text-primary uppercase tracking-widest mb-3">
+                  Philosophical Questions
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   <button
                     onClick={() =>
-                      setQuestion(
-                        "What is the nature of virtue and how can we cultivate it?",
-                      )
+                      setQuestion("What role should emotion play in decisions?")
                     }
                     className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    What is the nature of virtue?
+                    Emotion in decisions
                   </button>
                   <button
                     onClick={() =>
-                      setQuestion(
-                        "How should we balance individual freedom with social responsibility?",
-                      )
+                      setQuestion("Is consciousness fundamental or emergent?")
                     }
                     className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    Freedom vs. social responsibility
+                    Consciousness
                   </button>
                   <button
                     onClick={() =>
-                      setQuestion(
-                        "Is there an objective truth, or is everything relative to perspective?",
-                      )
+                      setQuestion("What is the nature of time?")
                     }
                     className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    Objective truth or relative?
+                    Nature of time
                   </button>
                   <button
                     onClick={() =>
-                      setQuestion(
-                        "What role should emotion play in moral decision-making?",
-                      )
+                      setQuestion("Can we have free will in a deterministic universe?")
                     }
                     className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    Emotion in moral decisions
+                    Free will vs determinism
                   </button>
                   <button
                     onClick={() =>
-                      setQuestion(
-                        "How can we live a meaningful life in a world without inherent purpose?",
-                      )
+                      setQuestion("What constitutes personal identity over time?")
                     }
                     className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
                   >
-                    Meaning in an indifferent universe
+                    Personal identity
+                  </button>
+                </div>
+                <div className="w-full border-t border-outline-variant/30 my-4" />
+                <p className="font-label text-[10px] text-secondary uppercase tracking-widest mb-3">
+                  Finance &amp; Risk
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <button
+                    onClick={() =>
+                      setQuestion("What drives market cycles and regime changes?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Market cycles
                   </button>
                   <button
                     onClick={() =>
-                      setQuestion("What does it mean to truly know oneself?")
+                      setQuestion("How do narratives shape financial decisions?")
                     }
-                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-primary hover:border-primary/30 transition-all"
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
                   >
-                    Knowing oneself
+                    Narratives in finance
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("How should we position for inflation or deflation?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Inflation vs deflation
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("What is the role of liquidity in portfolio construction?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Liquidity in portfolios
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("How do we think about tail risk and black swan events?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Tail risk & black swans
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("What is the relationship between leverage and fragility?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Leverage & fragility
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("How should we think about correlation across assets?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Asset correlation
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("What drives currency movements and geopolitical shifts?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Currency & geopolitics
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("How do we identify bubbles before they burst?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Identifying bubbles
+                  </button>
+                  <button
+                    onClick={() =>
+                      setQuestion("What is the role of central bank policy in markets?")
+                    }
+                    className="px-3 py-2 bg-surface-container border border-outline-variant/30 rounded-sm text-xs text-zinc-400 hover:text-secondary hover:border-secondary/30 transition-all"
+                  >
+                    Central bank policy
                   </button>
                 </div>
               </div>
