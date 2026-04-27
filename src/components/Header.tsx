@@ -8,11 +8,15 @@ interface HeaderProps {
   breadcrumbs?: { label: string; href?: string }[];
 }
 
-export function Header({ showBreadcrumbs = false, breadcrumbs = [] }: HeaderProps) {
+export function Header({
+  showBreadcrumbs = false,
+  breadcrumbs = [],
+}: HeaderProps) {
   const pathname = usePathname();
 
   const getLinkClass = (href: string) => {
-    const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
+    const isActive =
+      pathname === href || (href !== "/" && pathname.startsWith(href));
     return `font-label text-[10px] uppercase tracking-widest transition-colors duration-200 ${
       isActive ? "text-primary" : "text-zinc-400 hover:text-primary"
     }`;
@@ -22,7 +26,12 @@ export function Header({ showBreadcrumbs = false, breadcrumbs = [] }: HeaderProp
     <header className="fixed top-0 w-full z-50 bg-[#09090b] border-b border-[#27272a] flex justify-between items-center px-6 h-16">
       <div className="flex items-center gap-4">
         <Link href="/" className="text-primary self-center">
-          <span className="material-symbols-outlined align-middle" style={{ fontSize: '30px' }}>blur_circular</span>
+          <span
+            className="material-symbols-outlined align-middle"
+            style={{ fontSize: "30px" }}
+          >
+            motion_mode
+          </span>
         </Link>
         <h1 className="text-2xl font-headline font-bold tracking-widest text-primary uppercase">
           DIGITAL AGORA

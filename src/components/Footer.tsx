@@ -10,7 +10,7 @@ export function Footer() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-3xl">
-                psychology
+                motion_mode
               </span>
               <span className="font-headline text-xl uppercase tracking-tight">
                 AI-Phi
