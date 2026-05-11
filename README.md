@@ -28,6 +28,69 @@ A web application for engaging in intellectual dialogue with historical and cont
 - **AI Integration**: OpenAI / Anthropic APIs
 - **Authentication**: Supabase Auth (prepared)
 
+## Image Generation Workflow (ComfyUI)
+
+Philosopher headshots are generated and refined using ComfyUI workflows. The images are created via text-to-image generation, then edited for quality and consistency.
+
+### Image Creation Workflow
+
+Used for generating initial philosopher headshot images from text prompts.
+
+```
+prompt → Load Checkpoint Model → CLIP Set Last Layer → Load LoRA →
+Text Encoding (positive/negative) → Empty Latent Image →
+KSampler → VAE Decoder → Save Image
+```
+
+**How it works:**
+1. **Load Checkpoint Model** — Loads the base diffusion model (e.g., `qwen-image-2512-Q4_K_M.gguf`)
+2. **CLIP Set Last Layer** — Configures the text encoder's output layer for optimal prompt encoding
+3. **Load LoRA** — Applies Low-Rank Adaptation for style/specialty fine-tuning
+4. **Text Encoding (positive/negative)** — Encodes the positive prompt (what to generate) and negative prompt (what to avoid) into embeddings
+5. **Empty Latent Image** — Creates a random latent noise canvas to be decoded into pixels
+6. **KSampler** — Performs the diffusion sampling process to denoise the latent image based on text conditioning
+7. **VAE Decoder** — Decodes the latent representation into a visible image
+8. **Save Image** — Saves the final output
+
+**Models used:**
+- Unet: `qwen-image-2512-Q4_K_M.gguf`
+- VAE: `qwen_image_vae.safetensors`
+- CLIP: `qwen_2.5_vl_7b_fp8_scaled.safetensors`
+
+### Edit Image Workflow
+
+Used for refining existing images — adjusting quality, fixing artifacts, or applying consistent styling.
+
+```
+Image → Unet Loader (GGUF) → LoRA Loader → Load CLIP → Load VAE →
+Scale Image (FluxKontext) → VAE Encoder → TextEncoderQwenImageEditPlus →
+ModelSamplingAuraFlow → CFGNorm → KSampler → VAE Decode
+```
+
+**How it works:**
+1. **Image** — Input image to be edited
+2. **Unet Loader (GGUF)** — Loads the quantized unet model for efficient inference
+3. **LoRA Loader** — Loads style-adaptive LoRA weights
+4. **Load CLIP** — Loads the text encoder for conditioning
+5. **Load VAE** — Loads the Variational Autoencoder for encoding/decoding
+6. **Scale Image (FluxKontext)** — Resizes image to target resolution using FluxKontext algorithm
+7. **VAE Encoder** — Encodes the input image into latent space
+8. **TextEncoderQwenImageEditPlus** — Encodes both the input image features and edit instructions
+9. **ModelSamplingAuraFlow** — Applies AuraFlow sampling with model-specific shift values
+10. **CFGNorm** — Normalizes Classifier-Free Guidance for stable editing
+11. **KSampler** — Performs refined sampling with the edited prompt/image conditioning
+12. **VAE Decode** — Converts the edited latent back to a visible image
+
+### Sampler Settings
+
+| Parameter | Image Creation | Edit Image |
+|-----------|---------------|------------|
+| Seed | 211705319759482 | varies |
+| Steps | 10 | varies |
+| CFG | 4 | varies |
+| Sampler | dpmpp_2m | varies |
+| Scheduler | karras | simple |
+
 ## Design System
 
 The neon-socratic design language features:
@@ -106,9 +169,9 @@ flowchart TB
     subgraph Frontend["Frontend (Next.js App Router)"]
         Hub["Hub Page<br/>(/page.tsx)"]
         Arena["Arena Page<br/>(/arena)"]
-        Dialogue["Dialogue Page<br/>(/dialogue)"]
-        Debate["Debate Page<br/>(/debate)"]
-        Dossier["Dossier Page<br/>(/dossier)"]
+        Dialogue["Dialogue Interface<br/>(/dialogue/page.tsx)"]
+        Debate["Debate Chamber<br/>(/debate/page.tsx)"]
+        Dossier["Dossier Pages<br/>(/dossier)"]
         Archive["Archive Page<br/>(/archive)"]
         Settings["Settings Page<br/>(/settings)"]
     end
@@ -118,10 +181,15 @@ flowchart TB
         Navigation["Navigation"]
         Footer["Footer"]
         SidePanel["SidePanel"]
+        SidePanelWrapper["SidePanelWrapper"]
         HubClient["HubClient"]
         PhilosopherCard["PhilosopherCard"]
         ChatInterface["ChatInterface"]
         ComparisonView["ComparisonView"]
+        Breadcrumbs["Breadcrumbs"]
+        EmptyState["EmptyState"]
+        ErrorBoundary["ErrorBoundary"]
+        LoadingDots["LoadingDots"]
     end
 
     subgraph API["API Routes"]
@@ -136,9 +204,13 @@ flowchart TB
     end
 
     subgraph Database["Database (PostgreSQL)"]
+        UserTable["User"]
         PhilosopherTable["Philosopher"]
         ConversationTable["Conversation"]
+        ConversationParticipantTable["ConversationParticipant"]
         MessageTable["Message"]
+        CollectionTable["Collection"]
+        CollectionItemTable["CollectionItem"]
     end
 
     subgraph External["External Services"]
@@ -149,7 +221,7 @@ flowchart TB
 
     Frontend --> Components
     Components --> HubClient
-    HubClient --> SidePanel
+    HubClient --> SidePanelWrapper
     
     Hub --> Arena
     Hub --> Dialogue
@@ -161,7 +233,7 @@ flowchart TB
     Debate --> ChatInterface
     Dossier --> PhilosopherCard
     
-    Archive --> SidePanel
+    Archive --> SidePanelWrapper
     Archive --> ChatInterface
     
     Dialogue --> API
@@ -217,6 +289,14 @@ sequenceDiagram
 
 ```mermaid
 erDiagram
+    User {
+        string id PK
+        string email UK
+        string name
+        datetime createdAt
+        datetime updatedAt
+    }
+
     Philosopher {
         string id PK
         string name
@@ -228,14 +308,22 @@ erDiagram
         string systemPrompt
         string imageUrl
         datetime createdAt
+        datetime updatedAt
     }
 
     Conversation {
         string id PK
         string title
-        string type
+        string userId FK
         datetime createdAt
         datetime updatedAt
+    }
+
+    ConversationParticipant {
+        string id PK
+        string conversationId FK
+        string philosopherId FK
+        int position
     }
 
     Message {
@@ -246,19 +334,45 @@ erDiagram
         datetime createdAt
     }
 
-    Conversation ||--o{ Message : "has"
+    Collection {
+        string id PK
+        string name
+        string description
+        string userId FK
+        boolean isPublic
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CollectionItem {
+        string id PK
+        string collectionId FK
+        string philosopherId FK
+    }
+
+    User ||--o{ Conversation : "owns"
+    User ||--o{ Collection : "creates"
+    Philosopher ||--o{ ConversationParticipant : "participates"
+    Conversation ||--o{ ConversationParticipant : "has"
+    Conversation ||--o{ Message : "contains"
+    Collection ||--o{ CollectionItem : "contains"
+    Philosopher ||--o{ CollectionItem : "collects"
 ```
+
 
 ## Project Structure
 
 ```
 src/
 ├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Hub - Home/Dashboard with drag-and-drop
-│   ├── arena/             # Arena - Dialogue & Debate interface
+│   ├── page.tsx           # Hub - Home/Dashboard
+│   ├── arena/             # Arena - Unified Dialogue & Debate entry
 │   ├── dialogue/          # Dialogue Interface (single thinker)
+│   │   └── page.tsx
 │   ├── debate/            # Debate Chamber (multi-thinker)
+│   │   └── page.tsx
 │   ├── dossier/           # Thinker Dossiers
+│   │   ├── page.tsx       # All thinkers list
 │   │   └── [id]/          # Individual dossier pages
 │   ├── archive/           # Saved conversations
 │   ├── settings/          # App settings
@@ -269,12 +383,19 @@ src/
 ├── components/            # Reusable UI components
 │   ├── Header.tsx         # Top header bar
 │   ├── Navigation.tsx     # Bottom navigation bar
-│   ├── Footer.tsx        # Page footer with links
-│   ├── SidePanel.tsx      # Persistent archive/history sidebar
-│   ├── HubClient.tsx      # Hub page client component
+│   ├── Footer.tsx         # Page footer with links
+│   ├── SidePanel.tsx      # Archive/history sidebar
+│   ├── SidePanelWrapper.tsx
+│   ├── HubClient.tsx       # Hub page client component
 │   ├── PhilosopherCard.tsx
 │   ├── ChatInterface.tsx
-│   └── ComparisonView.tsx
+│   ├── ComparisonView.tsx
+│   ├── Breadcrumbs.tsx
+│   ├── EmptyState.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── LoadingDots.tsx
+│   ├── ConfirmDialog.tsx
+│   └── SubpageHeader.tsx
 └── lib/                   # Utilities
     ├── ai.ts              # OpenAI/Anthropic clients
     ├── db.ts              # Prisma client

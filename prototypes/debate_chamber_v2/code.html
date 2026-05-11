@@ -1,259 +1,435 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Digital Agora - Debate Chamber</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&amp;family=Plus+Jakarta+Sans:wght@300;400;600&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "tertiary-container": "#fd4e4d",
-                        "on-primary-container": "#005c38",
-                        "inverse-on-surface": "#565457",
-                        "secondary-fixed": "#bfd1ff",
-                        "on-primary-fixed": "#00472a",
-                        "error-container": "#9f0519",
-                        "secondary-container": "#005ac2",
-                        "surface-variant": "#262528",
-                        "surface": "#0e0e10",
-                        "on-secondary-fixed-variant": "#004da8",
-                        "surface-container-low": "#131315",
-                        "primary": "#b1ffce",
-                        "on-secondary": "#001e4a",
-                        "surface-dim": "#0e0e10",
-                        "primary-fixed": "#00ffa3",
-                        "on-surface": "#f9f5f8",
-                        "outline-variant": "#48474a",
-                        "on-surface-variant": "#adaaad",
-                        "primary-dim": "#00ef99",
-                        "inverse-primary": "#006d43",
-                        "surface-container-highest": "#262528",
-                        "on-tertiary-fixed": "#3a0003",
-                        "tertiary-dim": "#ff716a",
-                        "on-primary-fixed-variant": "#00673f",
-                        "outline": "#767577",
-                        "on-error-container": "#ffa8a3",
-                        "on-background": "#f9f5f8",
-                        "primary-container": "#00ffa3",
-                        "inverse-surface": "#fcf8fb",
-                        "secondary-fixed-dim": "#a9c4ff",
-                        "error-dim": "#d7383b",
-                        "on-primary": "#00663e",
-                        "tertiary-fixed-dim": "#ff7b74",
-                        "secondary-dim": "#699cff",
-                        "tertiary-fixed": "#ff928b",
-                        "surface-bright": "#2c2c2f",
-                        "on-tertiary-fixed-variant": "#79000e",
-                        "background": "#0e0e10",
-                        "on-error": "#490006",
-                        "on-secondary-container": "#f7f7ff",
-                        "tertiary": "#ff716a",
-                        "on-tertiary": "#490005",
-                        "error": "#ff716c",
-                        "surface-container-lowest": "#000000",
-                        "surface-container": "#19191c",
-                        "primary-fixed-dim": "#00ef99",
-                        "on-secondary-fixed": "#003271",
-                        "secondary": "#699cff",
-                        "surface-container-high": "#1f1f22",
-                        "on-tertiary-container": "#1f0001",
-                        "surface-tint": "#b1ffce"
-                    },
-                    fontFamily: {
-                        "headline": ["Space Grotesk"],
-                        "body": ["Plus Jakarta Sans"],
-                        "label": ["JetBrains Mono"]
-                    },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-                },
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Digital Agora - Debate Chamber</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&amp;family=Plus+Jakarta+Sans:wght@300;400;600&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#fd4e4d",
+              "on-primary-container": "#005c38",
+              "inverse-on-surface": "#565457",
+              "secondary-fixed": "#bfd1ff",
+              "on-primary-fixed": "#00472a",
+              "error-container": "#9f0519",
+              "secondary-container": "#005ac2",
+              "surface-variant": "#262528",
+              surface: "#0e0e10",
+              "on-secondary-fixed-variant": "#004da8",
+              "surface-container-low": "#131315",
+              primary: "#b1ffce",
+              "on-secondary": "#001e4a",
+              "surface-dim": "#0e0e10",
+              "primary-fixed": "#00ffa3",
+              "on-surface": "#f9f5f8",
+              "outline-variant": "#48474a",
+              "on-surface-variant": "#adaaad",
+              "primary-dim": "#00ef99",
+              "inverse-primary": "#006d43",
+              "surface-container-highest": "#262528",
+              "on-tertiary-fixed": "#3a0003",
+              "tertiary-dim": "#ff716a",
+              "on-primary-fixed-variant": "#00673f",
+              outline: "#767577",
+              "on-error-container": "#ffa8a3",
+              "on-background": "#f9f5f8",
+              "primary-container": "#00ffa3",
+              "inverse-surface": "#fcf8fb",
+              "secondary-fixed-dim": "#a9c4ff",
+              "error-dim": "#d7383b",
+              "on-primary": "#00663e",
+              "tertiary-fixed-dim": "#ff7b74",
+              "secondary-dim": "#699cff",
+              "tertiary-fixed": "#ff928b",
+              "surface-bright": "#2c2c2f",
+              "on-tertiary-fixed-variant": "#79000e",
+              background: "#0e0e10",
+              "on-error": "#490006",
+              "on-secondary-container": "#f7f7ff",
+              tertiary: "#ff716a",
+              "on-tertiary": "#490005",
+              error: "#ff716c",
+              "surface-container-lowest": "#000000",
+              "surface-container": "#19191c",
+              "primary-fixed-dim": "#00ef99",
+              "on-secondary-fixed": "#003271",
+              secondary: "#699cff",
+              "surface-container-high": "#1f1f22",
+              "on-tertiary-container": "#1f0001",
+              "surface-tint": "#b1ffce",
             },
-        }
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Plus Jakarta Sans"],
+              label: ["JetBrains Mono"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .diagonal-split {
-            clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
-        }
-        .diagonal-split-reverse {
-            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
-        }
-        .glass-panel {
-            background: rgba(14, 14, 16, 0.7);
-            backdrop-filter: blur(12px);
-        }
-        .neon-border-glow-primary {
-            box-shadow: 0 0 15px rgba(0, 255, 163, 0.15);
-        }
-        .neon-border-glow-error {
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
-        }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .diagonal-split {
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+      }
+      .diagonal-split-reverse {
+        clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+      }
+      .glass-panel {
+        background: rgba(14, 14, 16, 0.7);
+        backdrop-filter: blur(12px);
+      }
+      .neon-border-glow-primary {
+        box-shadow: 0 0 15px rgba(0, 255, 163, 0.15);
+      }
+      .neon-border-glow-error {
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+      }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
   </head>
-<body class="bg-background text-on-surface font-body overflow-x-hidden selection:bg-primary selection:text-surface-container-lowest">
-<!-- TopAppBar -->
-<header class="fixed top-0 w-full z-50 bg-[#09090B] dark:bg-[#09090B] border-b border-[#27272A] flex justify-between items-center px-6 h-16 w-full">
-<div class="flex items-center gap-4">
-<button class="text-[#00FFA3] active:scale-95 transition-transform">
-<span class="material-symbols-outlined">menu</span>
-</button>
-<h1 class="font-['Space_Grotesk'] font-bold tracking-tighter uppercase text-2xl tracking-widest text-[#00FFA3]">DIGITAL AGORA</h1>
-</div>
-<div class="flex items-center gap-4">
-<span class="font-label text-[10px] text-zinc-500 uppercase tracking-[0.2em] hidden md:block">Session: Logic_Matrix_042</span>
-<button class="text-[#00FFA3] active:scale-95 transition-transform">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-</div>
-</header>
-<main class="pt-16 pb-32 min-h-screen">
-<!-- Dual Header Section -->
-<section class="relative h-48 md:h-64 flex overflow-hidden border-b border-outline-variant/20">
-<!-- Aristotle Side -->
-<div class="relative flex-1 bg-surface-container-low flex flex-col justify-center items-start px-8 md:px-16 overflow-hidden">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img class="w-full h-full object-cover grayscale" data-alt="Close-up of weathered marble texture from a classical Greek bust with sharp shadows and highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrlyMwDfADye9q0tvWoQQJrtz243mvg0wfghs7MoWIfr_6FzmlbpqLJnbUcOdUEo4YQsZ4OcuUq47trVQx2eMbTETRxfc4wIbwdjqq3_9MMGNEpmsW96ndpMH08pjnHArdr58SUXu6AezPpXPCb-vGIDaNOMBVZlpj9FyUUJYgFymKrOwWZd_IbICiYHefdp56i_16zm1kVjUHeaue2OE3gMaX-FNfR2zYn3H7hHsVHdT3HgB-5M87u9Pf3hhT0l27iVS8I_A17nHN"/>
-</div>
-<div class="relative z-10">
-<span class="font-label text-primary-fixed text-xs tracking-widest uppercase mb-2 block">Classical Virtue</span>
-<h2 class="font-headline font-bold text-4xl md:text-6xl tracking-tighter italic">Aristotle</h2>
-</div>
-</div>
-<!-- Diagonal Divider -->
-<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-<div class="h-full w-px bg-primary/20 rotate-[20deg] scale-y-150"></div>
-</div>
-<!-- Machiavelli Side -->
-<div class="relative flex-1 bg-surface flex flex-col justify-center items-end px-8 md:px-16 overflow-hidden">
-<div class="absolute inset-0 opacity-10 pointer-events-none">
-<img class="w-full h-full object-cover grayscale" data-alt="Matrix digital rain code effect in monochrome grey on black background representing calculated power" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzJtxTmqXG0g7DPDXMn6lCZmAHFrwcD76FI2dyHxLTv244MHFnpfIVvEj9XQRNmkwiUd-ybAjh7R-jkjJ3DOXOVa5HXrxAhDLtcxQJKaItHQzE1_-6VtkkW_eCLzgBnGzJpmZBw9w8w4pgk-w0hMj8IMwJ2fLRIFKE879LX6_VZtXUV1BGfP4y2BBCxHLA406hJ2oFdBMpwCQvKbsa-P1CN58tWGrDPoBU7HDDJI8Z5sZfW7bHnu_3ulSVZpHi934X0faZYcNMvtdJ"/>
-</div>
-<div class="relative z-10 text-right">
-<span class="font-label text-secondary text-xs tracking-widest uppercase mb-2 block">Political Realism</span>
-<h2 class="font-headline font-bold text-4xl md:text-6xl tracking-tighter">Machiavelli</h2>
-</div>
-</div>
-</section>
-<!-- Debate Grid -->
-<section class="grid grid-cols-1 md:grid-cols-2 gap-0 relative">
-<!-- Mid-line indicator -->
-<div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-outline-variant/10 z-0"></div>
-<!-- Aristotle Column -->
-<div class="p-8 md:p-12 lg:p-16 space-y-8 relative z-10 border-b md:border-b-0 md:border-r border-outline-variant/10">
-<div class="flex items-center gap-3 font-label text-[10px] tracking-widest text-zinc-500 uppercase">
-<span class="w-2 h-2 rounded-full bg-primary-fixed"></span>
-<span>Argument: Teleological Ethics</span>
-</div>
-<div class="space-y-6">
-<p class="text-xl md:text-2xl font-light leading-relaxed text-on-surface/90">
-                        Politics is the master art of the <span class="text-primary-fixed font-semibold px-1 border-b border-primary-fixed/30">highest good</span>. The state exists not merely for life, but for the <span class="bg-primary-container/20 text-primary-fixed px-1 rounded-sm">good life</span>. If a ruler pursues power as an end, they cease to be a statesman and become a tyrant.
-                    </p>
-<p class="text-lg leading-relaxed text-on-surface/70">
-                        True authority stems from <span class="text-error font-medium underline decoration-error/30 decoration-2 underline-offset-4">virtuous character</span>. A leader must embody the golden mean, for any action taken through cruelty or deceit fractures the 
-                        <span class="bg-error-container/20 text-error px-1 rounded-sm">social teleology</span> that binds citizens together.
-                    </p>
-</div>
-<div class="pt-8 border-t border-outline-variant/10">
-<div class="font-label text-[10px] text-zinc-600 uppercase mb-4">Referenced Logic</div>
-<div class="flex flex-wrap gap-2">
-<span class="px-2 py-1 bg-surface-container text-[10px] font-label text-primary-fixed border border-primary-fixed/20 uppercase">Eudaimonia</span>
-<span class="px-2 py-1 bg-surface-container text-[10px] font-label text-zinc-400 border border-outline-variant uppercase">The Golden Mean</span>
-</div>
-</div>
-</div>
-<!-- Machiavelli Column -->
-<div class="p-8 md:p-12 lg:p-16 space-y-8 relative z-10">
-<div class="flex items-center gap-3 font-label text-[10px] tracking-widest text-zinc-500 uppercase">
-<span class="w-2 h-2 rounded-full bg-secondary"></span>
-<span>Argument: Pragramtic Realism</span>
-</div>
-<div class="space-y-6">
-<p class="text-xl md:text-2xl font-light leading-relaxed text-on-surface/90">
-                        The gap between how one lives and how one <span class="text-error font-semibold px-1 border-b border-error/30">ought to live</span> is so wide that a man who neglects what is done for what ought to be done learns his ruin.
-                    </p>
-<p class="text-lg leading-relaxed text-on-surface/70">
-                        A prince must be both a lion and a fox. To maintain the <span class="text-primary-fixed font-medium underline decoration-primary-fixed/30 decoration-2 underline-offset-4">stability of the state</span>, he must often act against faith, against charity, and against humanity. Virtue in politics is not morality, but <span class="bg-primary-container/20 text-primary-fixed px-1 rounded-sm">effective agency</span>.
-                    </p>
-</div>
-<div class="pt-8 border-t border-outline-variant/10">
-<div class="font-label text-[10px] text-zinc-600 uppercase mb-4">Referenced Logic</div>
-<div class="flex flex-wrap gap-2">
-<span class="px-2 py-1 bg-surface-container text-[10px] font-label text-secondary border border-secondary/20 uppercase">Necessità</span>
-<span class="px-2 py-1 bg-surface-container text-[10px] font-label text-zinc-400 border border-outline-variant uppercase">Raison d'État</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Consensus Card -->
-<section class="px-6 md:px-16 mt-12 mb-20">
-<div class="bg-surface-container border border-outline-variant/20 p-8 rounded-sm relative overflow-hidden">
-<!-- Decorative background pulse -->
-<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-[80px]"></div>
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-<div class="space-y-2">
-<div class="flex items-center gap-2 font-label text-[10px] font-bold text-primary-fixed tracking-[0.3em] uppercase">
-<span class="material-symbols-outlined text-sm">hub</span>
-                            POINT OF CONSENSUS
-                        </div>
-<h3 class="font-headline text-2xl font-bold tracking-tight">The Primacy of Stability</h3>
-<p class="text-on-surface-variant max-w-2xl leading-relaxed">
-                            Despite diverging on the <span class="italic text-on-surface">moral source</span> of authority, both thinkers agree that the fundamental failure of any political system is **anarchy**. Both prioritize the preservation of the political body as the prerequisite for any further human action.
-                        </p>
-</div>
-<div class="flex flex-col items-start md:items-end gap-2 shrink-0">
-<div class="font-label text-[10px] text-zinc-500 uppercase">Alignment Probability</div>
-<div class="text-4xl font-headline font-bold text-primary-fixed">74.2%</div>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- Synthesis FAB -->
-<div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
-<button class="bg-primary-container text-surface-container-lowest font-headline font-bold px-8 py-4 rounded-sm flex items-center gap-3 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,255,163,0.3)] hover:shadow-[0_0_45px_rgba(0,255,163,0.5)] border border-primary uppercase tracking-widest text-sm">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
-            Generate Synthesis
+  <body
+    class="bg-background text-on-surface font-body overflow-x-hidden selection:bg-primary selection:text-surface-container-lowest"
+  >
+    <!-- TopAppBar -->
+    <header
+      class="fixed top-0 w-full z-50 bg-[#09090B] dark:bg-[#09090B] border-b border-[#27272A] flex justify-between items-center px-6 h-16 w-full"
+    >
+      <div class="flex items-center gap-4">
+        <button class="text-[#00FFA3] active:scale-95 transition-transform">
+          <span class="material-symbols-outlined">menu</span>
         </button>
-</div>
-<!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full h-20 bg-[#0e0e10]/80 dark:bg-[#0e0e10]/80 backdrop-blur-xl border-t border-[#27272A] flex justify-around items-center px-4 pb-4 z-50">
-<a class="flex flex-col items-center justify-center text-[#00FFA3] drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Hub</span>
-</a>
-<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Archive</span>
-</a>
-<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Settings</span>
-</a>
-</nav>
-<!-- Decorative Corner Grids -->
-<div class="fixed bottom-24 right-4 pointer-events-none opacity-20 hidden lg:block">
-<div class="grid grid-cols-4 gap-1">
-<div class="w-1 h-1 bg-primary-fixed"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-<div class="w-1 h-1 bg-primary-fixed"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-<div class="w-1 h-1 bg-outline-variant"></div>
-</div>
-</div>
-</body></html>
+        <h1
+          class="font-['Space_Grotesk'] font-bold tracking-tighter uppercase text-2xl tracking-widest text-[#00FFA3]"
+        >
+          DIGITAL AGORA
+        </h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <span
+          class="font-label text-[10px] text-zinc-500 uppercase tracking-[0.2em] hidden md:block"
+          >Session: Logic_Matrix_042</span
+        >
+        <button class="text-[#00FFA3] active:scale-95 transition-transform">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+      </div>
+    </header>
+    <main class="pt-16 pb-32 min-h-screen">
+      <!-- Dual Header Section -->
+      <section
+        class="relative h-48 md:h-64 flex overflow-hidden border-b border-outline-variant/20"
+      >
+        <!-- Aristotle Side -->
+        <div
+          class="relative flex-1 bg-surface-container-low flex flex-col justify-center items-start px-8 md:px-16 overflow-hidden"
+        >
+          <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <img
+              class="w-full h-full object-cover grayscale"
+              data-alt="Close-up of weathered marble texture from a classical Greek bust with sharp shadows and highlights"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrlyMwDfADye9q0tvWoQQJrtz243mvg0wfghs7MoWIfr_6FzmlbpqLJnbUcOdUEo4YQsZ4OcuUq47trVQx2eMbTETRxfc4wIbwdjqq3_9MMGNEpmsW96ndpMH08pjnHArdr58SUXu6AezPpXPCb-vGIDaNOMBVZlpj9FyUUJYgFymKrOwWZd_IbICiYHefdp56i_16zm1kVjUHeaue2OE3gMaX-FNfR2zYn3H7hHsVHdT3HgB-5M87u9Pf3hhT0l27iVS8I_A17nHN"
+            />
+          </div>
+          <div class="relative z-10">
+            <span
+              class="font-label text-primary-fixed text-xs tracking-widest uppercase mb-2 block"
+              >Classical Virtue</span
+            >
+            <h2
+              class="font-headline font-bold text-4xl md:text-6xl tracking-tighter italic"
+            >
+              Aristotle
+            </h2>
+          </div>
+        </div>
+        <!-- Diagonal Divider -->
+        <div
+          class="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+        >
+          <div
+            class="h-full w-px bg-primary/20 rotate-[20deg] scale-y-150"
+          ></div>
+        </div>
+        <!-- Machiavelli Side -->
+        <div
+          class="relative flex-1 bg-surface flex flex-col justify-center items-end px-8 md:px-16 overflow-hidden"
+        >
+          <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <img
+              class="w-full h-full object-cover grayscale"
+              data-alt="Matrix digital rain code effect in monochrome grey on black background representing calculated power"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzJtxTmqXG0g7DPDXMn6lCZmAHFrwcD76FI2dyHxLTv244MHFnpfIVvEj9XQRNmkwiUd-ybAjh7R-jkjJ3DOXOVa5HXrxAhDLtcxQJKaItHQzE1_-6VtkkW_eCLzgBnGzJpmZBw9w8w4pgk-w0hMj8IMwJ2fLRIFKE879LX6_VZtXUV1BGfP4y2BBCxHLA406hJ2oFdBMpwCQvKbsa-P1CN58tWGrDPoBU7HDDJI8Z5sZfW7bHnu_3ulSVZpHi934X0faZYcNMvtdJ"
+            />
+          </div>
+          <div class="relative z-10 text-right">
+            <span
+              class="font-label text-secondary text-xs tracking-widest uppercase mb-2 block"
+              >Political Realism</span
+            >
+            <h2
+              class="font-headline font-bold text-4xl md:text-6xl tracking-tighter"
+            >
+              Machiavelli
+            </h2>
+          </div>
+        </div>
+      </section>
+      <!-- Debate Grid -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-0 relative">
+        <!-- Mid-line indicator -->
+        <div
+          class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-outline-variant/10 z-0"
+        ></div>
+        <!-- Aristotle Column -->
+        <div
+          class="p-8 md:p-12 lg:p-16 space-y-8 relative z-10 border-b md:border-b-0 md:border-r border-outline-variant/10"
+        >
+          <div
+            class="flex items-center gap-3 font-label text-[10px] tracking-widest text-zinc-500 uppercase"
+          >
+            <span class="w-2 h-2 rounded-full bg-primary-fixed"></span>
+            <span>Argument: Teleological Ethics</span>
+          </div>
+          <div class="space-y-6">
+            <p
+              class="text-xl md:text-2xl font-light leading-relaxed text-on-surface/90"
+            >
+              Politics is the master art of the
+              <span
+                class="text-primary-fixed font-semibold px-1 border-b border-primary-fixed/30"
+                >highest good</span
+              >. The state exists not merely for life, but for the
+              <span
+                class="bg-primary-container/20 text-primary-fixed px-1 rounded-sm"
+                >good life</span
+              >. If a ruler pursues power as an end, they cease to be a
+              statesman and become a tyrant.
+            </p>
+            <p class="text-lg leading-relaxed text-on-surface/70">
+              True authority stems from
+              <span
+                class="text-error font-medium underline decoration-error/30 decoration-2 underline-offset-4"
+                >virtuous character</span
+              >. A leader must embody the golden mean, for any action taken
+              through cruelty or deceit fractures the
+              <span class="bg-error-container/20 text-error px-1 rounded-sm"
+                >social teleology</span
+              >
+              that binds citizens together.
+            </p>
+          </div>
+          <div class="pt-8 border-t border-outline-variant/10">
+            <div class="font-label text-[10px] text-zinc-600 uppercase mb-4">
+              Referenced Logic
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-2 py-1 bg-surface-container text-[10px] font-label text-primary-fixed border border-primary-fixed/20 uppercase"
+                >Eudaimonia</span
+              >
+              <span
+                class="px-2 py-1 bg-surface-container text-[10px] font-label text-zinc-400 border border-outline-variant uppercase"
+                >The Golden Mean</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- Machiavelli Column -->
+        <div class="p-8 md:p-12 lg:p-16 space-y-8 relative z-10">
+          <div
+            class="flex items-center gap-3 font-label text-[10px] tracking-widest text-zinc-500 uppercase"
+          >
+            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+            <span>Argument: Pragramtic Realism</span>
+          </div>
+          <div class="space-y-6">
+            <p
+              class="text-xl md:text-2xl font-light leading-relaxed text-on-surface/90"
+            >
+              The gap between how one lives and how one
+              <span
+                class="text-error font-semibold px-1 border-b border-error/30"
+                >ought to live</span
+              >
+              is so wide that a man who neglects what is done for what ought to
+              be done learns his ruin.
+            </p>
+            <p class="text-lg leading-relaxed text-on-surface/70">
+              A prince must be both a lion and a fox. To maintain the
+              <span
+                class="text-primary-fixed font-medium underline decoration-primary-fixed/30 decoration-2 underline-offset-4"
+                >stability of the state</span
+              >, he must often act against faith, against charity, and against
+              humanity. Virtue in politics is not morality, but
+              <span
+                class="bg-primary-container/20 text-primary-fixed px-1 rounded-sm"
+                >effective agency</span
+              >.
+            </p>
+          </div>
+          <div class="pt-8 border-t border-outline-variant/10">
+            <div class="font-label text-[10px] text-zinc-600 uppercase mb-4">
+              Referenced Logic
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-2 py-1 bg-surface-container text-[10px] font-label text-secondary border border-secondary/20 uppercase"
+                >Necessità</span
+              >
+              <span
+                class="px-2 py-1 bg-surface-container text-[10px] font-label text-zinc-400 border border-outline-variant uppercase"
+                >Raison d'État</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Consensus Card -->
+      <section class="px-6 md:px-16 mt-12 mb-20">
+        <div
+          class="bg-surface-container border border-outline-variant/20 p-8 rounded-sm relative overflow-hidden"
+        >
+          <!-- Decorative background pulse -->
+          <div
+            class="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-[80px]"
+          ></div>
+          <div
+            class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10"
+          >
+            <div class="space-y-2">
+              <div
+                class="flex items-center gap-2 font-label text-[10px] font-bold text-primary-fixed tracking-[0.3em] uppercase"
+              >
+                <span class="material-symbols-outlined text-sm">hub</span>
+                POINT OF CONSENSUS
+              </div>
+              <h3 class="font-headline text-2xl font-bold tracking-tight">
+                The Primacy of Stability
+              </h3>
+              <p class="text-on-surface-variant max-w-2xl leading-relaxed">
+                Despite diverging on the
+                <span class="italic text-on-surface">moral source</span> of
+                authority, both thinkers agree that the fundamental failure of
+                any political system is **anarchy**. Both prioritize the
+                preservation of the political body as the prerequisite for any
+                further human action.
+              </p>
+            </div>
+            <div class="flex flex-col items-start md:items-end gap-2 shrink-0">
+              <div class="font-label text-[10px] text-zinc-500 uppercase">
+                Alignment Probability
+              </div>
+              <div class="text-4xl font-headline font-bold text-primary-fixed">
+                74.2%
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- Synthesis FAB -->
+    <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
+      <button
+        class="bg-primary-container text-surface-container-lowest font-headline font-bold px-8 py-4 rounded-sm flex items-center gap-3 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,255,163,0.3)] hover:shadow-[0_0_45px_rgba(0,255,163,0.5)] border border-primary uppercase tracking-widest text-sm"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >bolt</span
+        >
+        Generate Synthesis
+      </button>
+    </div>
+    <!-- BottomNavBar -->
+    <nav
+      class="fixed bottom-0 left-0 w-full h-20 bg-[#0e0e10]/80 dark:bg-[#0e0e10]/80 backdrop-blur-xl border-t border-[#27272A] flex justify-around items-center px-4 pb-4 z-50"
+    >
+      <a
+        class="flex flex-col items-center justify-center text-[#00FFA3] drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] active:scale-90 transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="grid_view"
+          >grid_view</span
+        >
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Hub</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="history_edu"
+          >history_edu</span
+        >
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Archive</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="settings"
+          >settings</span
+        >
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Settings</span
+        >
+      </a>
+    </nav>
+    <!-- Decorative Corner Grids -->
+    <div
+      class="fixed bottom-24 right-4 pointer-events-none opacity-20 hidden lg:block"
+    >
+      <div class="grid grid-cols-4 gap-1">
+        <div class="w-1 h-1 bg-primary-fixed"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+        <div class="w-1 h-1 bg-primary-fixed"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+        <div class="w-1 h-1 bg-outline-variant"></div>
+      </div>
+    </div>
+  </body>
+</html>

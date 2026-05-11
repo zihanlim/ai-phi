@@ -1,13 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;family=Plus+Jakarta+Sans:wght@400;500&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;family=Plus+Jakarta+Sans:wght@400;500&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=motion_mode"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 600,
+          "GRAD" -25,
+          "opsz" 48;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
@@ -21,10 +40,10 @@
               "error-container": "#9f0519",
               "secondary-container": "#005ac2",
               "surface-variant": "#262528",
-              "surface": "#0e0e10",
+              surface: "#0e0e10",
               "on-secondary-fixed-variant": "#004da8",
               "surface-container-low": "#131315",
-              "primary": "#b1ffce",
+              primary: "#b1ffce",
               "on-secondary": "#001e4a",
               "surface-dim": "#0e0e10",
               "primary-fixed": "#00ffa3",
@@ -37,7 +56,7 @@
               "on-tertiary-fixed": "#3a0003",
               "tertiary-dim": "#ff716a",
               "on-primary-fixed-variant": "#00673f",
-              "outline": "#767577",
+              outline: "#767577",
               "on-error-container": "#ffa8a3",
               "on-background": "#f9f5f8",
               "primary-container": "#00ffa3",
@@ -50,183 +69,361 @@
               "tertiary-fixed": "#ff928b",
               "surface-bright": "#2c2c2f",
               "on-tertiary-fixed-variant": "#79000e",
-              "background": "#0e0e10",
+              background: "#0e0e10",
               "on-error": "#490006",
               "on-secondary-container": "#f7f7ff",
-              "tertiary": "#ff716a",
+              tertiary: "#ff716a",
               "on-tertiary": "#490005",
-              "error": "#ff716c",
+              error: "#ff716c",
               "surface-container-lowest": "#000000",
               "surface-container": "#19191c",
               "primary-fixed-dim": "#00ef99",
               "on-secondary-fixed": "#003271",
-              "secondary": "#699cff",
+              secondary: "#699cff",
               "surface-container-high": "#1f1f22",
               "on-tertiary-container": "#1f0001",
-              "surface-tint": "#b1ffce"
+              "surface-tint": "#b1ffce",
             },
             fontFamily: {
-              "headline": ["Space Grotesk"],
-              "body": ["Plus Jakarta Sans"],
-              "label": ["JetBrains Mono"]
+              headline: ["Space Grotesk"],
+              body: ["Plus Jakarta Sans"],
+              label: ["JetBrains Mono"],
             },
-            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
           },
         },
-      }
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
   </head>
-<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-surface-container-lowest">
-<!-- TopAppBar -->
-<header class="fixed top-0 w-full z-50 bg-[#09090B] dark:bg-[#09090B] border-b border-[#27272A] flex justify-between items-center px-6 h-16">
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-[#00FFA3] active:scale-95 transition-transform cursor-pointer">menu</span>
-<h1 class="text-2xl font-['Space_Grotesk'] font-bold tracking-widest text-[#00FFA3] uppercase">DIGITAL AGORA</h1>
-</div>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-zinc-400 hover:text-[#00FFA3] transition-colors duration-200 cursor-pointer">notifications</span>
-</div>
-</header>
-<main class="pt-20 pb-24 min-h-screen">
-<!-- Roster Section -->
-<section class="mb-10">
-<div class="px-6 flex justify-between items-end mb-4">
-<h2 class="font-headline text-3xl tracking-tighter uppercase">Roster</h2>
-<span class="font-label text-[10px] text-primary-fixed uppercase tracking-[0.2em]">Active Intellectuals</span>
-</div>
-<div class="flex gap-4 overflow-x-auto px-6 hide-scrollbar">
-<!-- Card 1 -->
-<div class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]">
-<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500" data-alt="Grayscale studio portrait of an elderly bearded philosopher with intense eyes and weathered features in dramatic high contrast lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD-gcxHo0aqbybCBvVD4t1yUl2Lm67aRtYOS4RqLrpJYnJFZ0x7yVTML14JlUUeAYilgjsD-J6qVV6l5MbT2Chj6BV_niOa1inLWV_hkoiIfPaBeYeB-nY3pETKMcdHamfr2NM8UQ6J3qHZYvN17-eDkrCIVnV9_Lk9WOXSsfXasi2__pmsjwySgir_Bl7LrwJZpCtto32URmOk45LWj-luH3nJIr5-K4BfDUQDTuRVf2h474AqEAJcY9lqQVucXDu4B2_Ohl0FuWH"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-<div class="absolute bottom-2 left-3">
-<p class="font-headline text-sm tracking-tight">Nietzsche</p>
-<p class="font-label text-[9px] text-zinc-500">1844-1900</p>
-</div>
-</div>
-<!-- Card 2 -->
-<div class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]">
-<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500" data-alt="Monochromatic portrait of a stern-looking thinker with glasses and messy hair in a classic mid-century intellectual style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAReFz-bjVFvOq2RYbNxFe6mXRRFHbAKleNAuwj805E35aORs3T6yqKUQLuyPlUN6fWbRfsVPXtP-05ONAcKGf05AMtKZ29S2PNA7rsZlyVA5v5srFoviZ2G34xrs5nhOW0MV2aKH7v5lpv_XuAYWjCroZRyjq8ItrsLNhUqa1tlZMWES3xzxZJ4ukLbqtea2P1o0gJu-ymiZXcdDvJwNLKzhqT6C5I6BPbSAtbQ0zYLYb5qb5CcE-d4WYsI9Tnnl1UHn6voNrEtWG"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-<div class="absolute bottom-2 left-3">
-<p class="font-headline text-sm tracking-tight">Sartre</p>
-<p class="font-label text-[9px] text-zinc-500">1905-1980</p>
-</div>
-</div>
-<!-- Card 3 -->
-<div class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]">
-<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500" data-alt="High-contrast grayscale photo of a profile of a man with sharp features and a powdered wig aesthetic, representing enlightenment era" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYwZ0IQwzdxa-1_iVZgkJL9aV5IpwsgnflTdNOzM8uleO0qS_xkAvgbCfGmsINRtG8gZIzNESP_mC4BttCq8Ew_2LReSKv-mX99nW_4cYCm5FdcohNKSC2Byk8rQul4ddRJmPmuIbDxIJC2byDkHEAYjmRBCjoNogn4MVwLvjW9J8k3cjDnSkv9ZxLXLDa_fDWNdRgphsIpb2H0RrLh-3b6NlRlYpMWYy3jMOKAtukOmUGzi5_byaGxaG3Ra5U5KY8irkjQKTzK2AR"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-<div class="absolute bottom-2 left-3">
-<p class="font-headline text-sm tracking-tight">Kant</p>
-<p class="font-label text-[9px] text-zinc-500">1724-1804</p>
-</div>
-</div>
-<!-- Card 4 (Machiavelli) -->
-<div class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]">
-<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500" data-alt="Grayscale dramatic lighting on a statue-like face of a Renaissance thinker with a calculating expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABQ6DUWa9dr0DRIpR2NKnzdN2A2ZuyF2S_s-et-DO1tOSutRAzY6b0y04yec7VPWV0eyp5qpxsNiXJBZ6Ey936Hq2PSOsMyJHgNTA7HZyHqRFszNTzKlmGyBV1IE6ocaE7ZHnl8W-jBeCP7PY4gWSc71WK4TKw0p1Hfxctmxs8t3tk_XMsmv-AzFP1n0O8AvuvawNNtkqZobX8aiyeXg4Gv2xCj_y6ctucv2S9BnSZ0PbjbJeTi67FkfDVc6bldGmn2CyiMHdx38Bl"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-<div class="absolute bottom-2 left-3">
-<p class="font-headline text-sm tracking-tight">Machiavelli</p>
-<p class="font-label text-[9px] text-zinc-500">1469-1527</p>
-</div>
-</div>
-</div>
-</section>
-<!-- Debate Feed -->
-<section class="px-6 space-y-6">
-<div class="flex justify-between items-center">
-<h2 class="font-headline text-3xl tracking-tighter uppercase">Threads</h2>
-<div class="h-[1px] flex-grow mx-4 bg-[#27272A]"></div>
-</div>
-<!-- Custom Debate Card (Top of Feed) -->
-<button class="w-full bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 py-8 flex flex-col items-center justify-center group hover:border-primary-fixed transition-colors rounded-[2px]">
-<div class="w-12 h-12 rounded-full border border-primary-fixed/30 flex items-center justify-center mb-3 group-hover:bg-primary-fixed/10 transition-all">
-<span class="material-symbols-outlined text-primary-fixed">add</span>
-</div>
-<span class="font-headline text-lg tracking-tight uppercase group-hover:text-primary-fixed transition-colors">Initiate Custom Debate</span>
-<span class="font-label text-[10px] text-zinc-500 mt-1 uppercase tracking-widest">Select logic parameters</span>
-</button>
-<!-- Debate Scenario 1 -->
-<div class="bg-surface-container border border-outline-variant/10 rounded-[2px] overflow-hidden group cursor-pointer">
-<div class="h-48 relative">
-<img class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Abstract digital rendering of a glowing neural network mesh against a dark void with cyan and blue energy pulses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnPpwAB1-G6jprliLA7qWBi8wpCHeq91N2ieNdMd1tPhCAXod8lg1T787h5GWtlHMpaVTHzFA8CBLQrBzMeKSvselly-99tmsGQ8xj2foL6HDmZt68G_92fl0VSLfvDO1r3nwYulkMiSZ0iUP-YCHU5IvH34mCKkep3STpzJi7V6fux5b85q8TdztzNJfCNZLpCbOuXq4qasMOp3sH3oOTdsZ_ExEQcT0i4MvsvVthPDojPTqPxmeaY1dj7RkjiiFukLRFz0lF_-nU"/>
-<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
-<div class="absolute top-4 right-4 bg-primary-fixed text-surface-container-lowest font-label text-[9px] px-2 py-1 font-bold tracking-widest uppercase">Ongoing</div>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<span class="font-label text-[10px] text-secondary tracking-widest uppercase">Ethics &amp; Tech</span>
-<span class="font-label text-[10px] text-zinc-500">12m ago</span>
-</div>
-<h3 class="font-headline text-xl mb-4 leading-none">Ethics of AI: Kant vs. Mill</h3>
-<p class="text-on-surface-variant text-sm line-clamp-2 font-body mb-6">Deontological constraints meet utilitarian maximization in the realm of autonomous systems. Who holds the moral compass?</p>
-<div class="flex justify-between items-center border-t border-outline-variant/10 pt-4">
-<div class="flex -space-x-2">
-<div class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-800 flex items-center justify-center text-[10px] font-headline">K</div>
-<div class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-700 flex items-center justify-center text-[10px] font-headline">M</div>
-</div>
-<button class="text-primary-fixed font-label text-[10px] uppercase tracking-widest flex items-center gap-2 hover:underline">
-                            Enter Arena <span class="material-symbols-outlined text-xs">arrow_forward</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Debate Scenario 2 -->
-<div class="bg-surface-container border border-outline-variant/10 rounded-[2px] overflow-hidden group cursor-pointer">
-<div class="h-48 relative">
-<img class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Monolithic dark geometric structure floating in a hazy grey atmosphere with sharp architectural lines and shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpH2LYew4cGwdIEkchswrc4UtNh2QpSif3uFOf7IGtU23kaqIODrZ9zLOnM2-dYcEVipphOSvzt0p7mso5Twvw_1woqg1KpXe25CGcKr-AvOk7Rrm-a6Ru2_wbFsN3KGIgMyOUKaZcsSj9u9dYlQScS1lW7UpL_NkRyo37RrbwnAXnr4r8Mca-ItCKNdFJLm6vYynxxNcr9nlcV18Jj0toYh8tlVvzgdKSpNp9oTE5It8yina7W3D48jz327JFoY1jHYmev6yrE6X_"/>
-<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
-<div class="absolute top-4 right-4 bg-zinc-800 text-zinc-400 font-label text-[9px] px-2 py-1 font-bold tracking-widest uppercase">Concluded</div>
-</div>
-<div class="p-6">
-<div class="flex justify-between items-start mb-2">
-<span class="font-label text-[10px] text-secondary tracking-widest uppercase">Political Theory</span>
-<span class="font-label text-[10px] text-zinc-500">2h ago</span>
-</div>
-<h3 class="font-headline text-xl mb-4 leading-none">Modern Power: Machiavelli vs. Hobbes</h3>
-<p class="text-on-surface-variant text-sm line-clamp-2 font-body mb-6">The Prince meets Leviathan. An examination of statecraft and the social contract in a post-globalization landscape.</p>
-<div class="flex justify-between items-center border-t border-outline-variant/10 pt-4">
-<div class="flex -space-x-2">
-<div class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-800 flex items-center justify-center text-[10px] font-headline">M</div>
-<div class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-700 flex items-center justify-center text-[10px] font-headline">H</div>
-</div>
-<button class="text-zinc-400 font-label text-[10px] uppercase tracking-widest flex items-center gap-2">
-                            Read Transcript <span class="material-symbols-outlined text-xs">history_edu</span>
-</button>
-</div>
-</div>
-</div>
-</section>
-</main>
-<!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full h-20 bg-[#0e0e10]/80 backdrop-blur-xl border-t border-[#27272A] flex justify-around items-center px-4 pb-4 z-50">
-<!-- Hub (Active) -->
-<a class="flex flex-col items-center justify-center text-[#00FFA3] drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Hub</span>
-</a>
-<!-- Archive -->
-<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined">history_edu</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Archive</span>
-</a>
-<!-- Settings -->
-<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1">Settings</span>
-</a>
-</nav>
-</body></html>
+  <body
+    class="bg-surface text-on-surface font-body selection:bg-primary selection:text-surface-container-lowest"
+  >
+    <!-- TopAppBar -->
+    <header
+      class="fixed top-0 w-full z-50 bg-[#09090B] dark:bg-[#09090B] border-b border-[#27272A] flex justify-between items-center px-6 h-16"
+    >
+      <div class="flex items-center gap-4">
+        <span
+          class="material-symbols-outlined text-[#00FFA3] active:scale-95 transition-transform cursor-pointer"
+          >motion_mode</span
+        >
+        <h1
+          class="text-2xl font-['Space_Grotesk'] font-bold tracking-widest text-[#00FFA3] uppercase"
+        >
+          DIGITAL AGORA
+        </h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <span
+          class="material-symbols-outlined text-zinc-400 hover:text-[#00FFA3] transition-colors duration-200 cursor-pointer"
+          >notifications</span
+        >
+      </div>
+    </header>
+    <main class="pt-20 pb-24 min-h-screen">
+      <!-- Roster Section -->
+      <section class="mb-10">
+        <div class="px-6 flex justify-between items-end mb-4">
+          <h2 class="font-headline text-3xl tracking-tighter uppercase">
+            Roster
+          </h2>
+          <span
+            class="font-label text-[10px] text-primary-fixed uppercase tracking-[0.2em]"
+            >Active Intellectuals</span
+          >
+        </div>
+        <div class="flex gap-4 overflow-x-auto px-6 hide-scrollbar">
+          <!-- Card 1 -->
+          <div
+            class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]"
+          >
+            <img
+              class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+              data-alt="Grayscale studio portrait of an elderly bearded philosopher with intense eyes and weathered features in dramatic high contrast lighting"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD-gcxHo0aqbybCBvVD4t1yUl2Lm67aRtYOS4RqLrpJYnJFZ0x7yVTML14JlUUeAYilgjsD-J6qVV6l5MbT2Chj6BV_niOa1inLWV_hkoiIfPaBeYeB-nY3pETKMcdHamfr2NM8UQ6J3qHZYvN17-eDkrCIVnV9_Lk9WOXSsfXasi2__pmsjwySgir_Bl7LrwJZpCtto32URmOk45LWj-luH3nJIr5-K4BfDUQDTuRVf2h474AqEAJcY9lqQVucXDu4B2_Ohl0FuWH"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"
+            ></div>
+            <div class="absolute bottom-2 left-3">
+              <p class="font-headline text-sm tracking-tight">Nietzsche</p>
+              <p class="font-label text-[9px] text-zinc-500">1844-1900</p>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div
+            class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]"
+          >
+            <img
+              class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+              data-alt="Monochromatic portrait of a stern-looking thinker with glasses and messy hair in a classic mid-century intellectual style"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAReFz-bjVFvOq2RYbNxFe6mXRRFHbAKleNAuwj805E35aORs3T6yqKUQLuyPlUN6fWbRfsVPXtP-05ONAcKGf05AMtKZ29S2PNA7rsZlyVA5v5srFoviZ2G34xrs5nhOW0MV2aKH7v5lpv_XuAYWjCroZRyjq8ItrsLNhUqa1tlZMWES3xzxZJ4ukLbqtea2P1o0gJu-ymiZXcdDvJwNLKzhqT6C5I6BPbSAtbQ0zYLYb5qb5CcE-d4WYsI9Tnnl1UHn6voNrEtWG"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"
+            ></div>
+            <div class="absolute bottom-2 left-3">
+              <p class="font-headline text-sm tracking-tight">Sartre</p>
+              <p class="font-label text-[9px] text-zinc-500">1905-1980</p>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div
+            class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]"
+          >
+            <img
+              class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+              data-alt="High-contrast grayscale photo of a profile of a man with sharp features and a powdered wig aesthetic, representing enlightenment era"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYwZ0IQwzdxa-1_iVZgkJL9aV5IpwsgnflTdNOzM8uleO0qS_xkAvgbCfGmsINRtG8gZIzNESP_mC4BttCq8Ew_2LReSKv-mX99nW_4cYCm5FdcohNKSC2Byk8rQul4ddRJmPmuIbDxIJC2byDkHEAYjmRBCjoNogn4MVwLvjW9J8k3cjDnSkv9ZxLXLDa_fDWNdRgphsIpb2H0RrLh-3b6NlRlYpMWYy3jMOKAtukOmUGzi5_byaGxaG3Ra5U5KY8irkjQKTzK2AR"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"
+            ></div>
+            <div class="absolute bottom-2 left-3">
+              <p class="font-headline text-sm tracking-tight">Kant</p>
+              <p class="font-label text-[9px] text-zinc-500">1724-1804</p>
+            </div>
+          </div>
+          <!-- Card 4 (Machiavelli) -->
+          <div
+            class="flex-shrink-0 w-[140px] h-[180px] bg-surface-container-high border border-outline-variant/20 relative group cursor-pointer overflow-hidden rounded-[2px]"
+          >
+            <img
+              class="absolute inset-0 w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+              data-alt="Grayscale dramatic lighting on a statue-like face of a Renaissance thinker with a calculating expression"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuABQ6DUWa9dr0DRIpR2NKnzdN2A2ZuyF2S_s-et-DO1tOSutRAzY6b0y04yec7VPWV0eyp5qpxsNiXJBZ6Ey936Hq2PSOsMyJHgNTA7HZyHqRFszNTzKlmGyBV1IE6ocaE7ZHnl8W-jBeCP7PY4gWSc71WK4TKw0p1Hfxctmxs8t3tk_XMsmv-AzFP1n0O8AvuvawNNtkqZobX8aiyeXg4Gv2xCj_y6ctucv2S9BnSZ0PbjbJeTi67FkfDVc6bldGmn2CyiMHdx38Bl"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"
+            ></div>
+            <div class="absolute bottom-2 left-3">
+              <p class="font-headline text-sm tracking-tight">Machiavelli</p>
+              <p class="font-label text-[9px] text-zinc-500">1469-1527</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Debate Feed -->
+      <section class="px-6 space-y-6">
+        <div class="flex justify-between items-center">
+          <h2 class="font-headline text-3xl tracking-tighter uppercase">
+            Threads
+          </h2>
+          <div class="h-[1px] flex-grow mx-4 bg-[#27272A]"></div>
+        </div>
+        <!-- Custom Debate Card (Top of Feed) -->
+        <button
+          class="w-full bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 py-8 flex flex-col items-center justify-center group hover:border-primary-fixed transition-colors rounded-[2px]"
+        >
+          <div
+            class="w-12 h-12 rounded-full border border-primary-fixed/30 flex items-center justify-center mb-3 group-hover:bg-primary-fixed/10 transition-all"
+          >
+            <span class="material-symbols-outlined text-primary-fixed"
+              >add</span
+            >
+          </div>
+          <span
+            class="font-headline text-lg tracking-tight uppercase group-hover:text-primary-fixed transition-colors"
+            >Initiate Custom Debate</span
+          >
+          <span
+            class="font-label text-[10px] text-zinc-500 mt-1 uppercase tracking-widest"
+            >Select logic parameters</span
+          >
+        </button>
+        <!-- Debate Scenario 1 -->
+        <div
+          class="bg-surface-container border border-outline-variant/10 rounded-[2px] overflow-hidden group cursor-pointer"
+        >
+          <div class="h-48 relative">
+            <img
+              class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
+              data-alt="Abstract digital rendering of a glowing neural network mesh against a dark void with cyan and blue energy pulses"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnPpwAB1-G6jprliLA7qWBi8wpCHeq91N2ieNdMd1tPhCAXod8lg1T787h5GWtlHMpaVTHzFA8CBLQrBzMeKSvselly-99tmsGQ8xj2foL6HDmZt68G_92fl0VSLfvDO1r3nwYulkMiSZ0iUP-YCHU5IvH34mCKkep3STpzJi7V6fux5b85q8TdztzNJfCNZLpCbOuXq4qasMOp3sH3oOTdsZ_ExEQcT0i4MvsvVthPDojPTqPxmeaY1dj7RkjiiFukLRFz0lF_-nU"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"
+            ></div>
+            <div
+              class="absolute top-4 right-4 bg-primary-fixed text-surface-container-lowest font-label text-[9px] px-2 py-1 font-bold tracking-widest uppercase"
+            >
+              Ongoing
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-2">
+              <span
+                class="font-label text-[10px] text-secondary tracking-widest uppercase"
+                >Ethics &amp; Tech</span
+              >
+              <span class="font-label text-[10px] text-zinc-500">12m ago</span>
+            </div>
+            <h3 class="font-headline text-xl mb-4 leading-none">
+              Ethics of AI: Kant vs. Mill
+            </h3>
+            <p
+              class="text-on-surface-variant text-sm line-clamp-2 font-body mb-6"
+            >
+              Deontological constraints meet utilitarian maximization in the
+              realm of autonomous systems. Who holds the moral compass?
+            </p>
+            <div
+              class="flex justify-between items-center border-t border-outline-variant/10 pt-4"
+            >
+              <div class="flex -space-x-2">
+                <div
+                  class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-800 flex items-center justify-center text-[10px] font-headline"
+                >
+                  K
+                </div>
+                <div
+                  class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-700 flex items-center justify-center text-[10px] font-headline"
+                >
+                  M
+                </div>
+              </div>
+              <button
+                class="text-primary-fixed font-label text-[10px] uppercase tracking-widest flex items-center gap-2 hover:underline"
+              >
+                Enter Arena
+                <span class="material-symbols-outlined text-xs"
+                  >arrow_forward</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Debate Scenario 2 -->
+        <div
+          class="bg-surface-container border border-outline-variant/10 rounded-[2px] overflow-hidden group cursor-pointer"
+        >
+          <div class="h-48 relative">
+            <img
+              class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
+              data-alt="Monolithic dark geometric structure floating in a hazy grey atmosphere with sharp architectural lines and shadows"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpH2LYew4cGwdIEkchswrc4UtNh2QpSif3uFOf7IGtU23kaqIODrZ9zLOnM2-dYcEVipphOSvzt0p7mso5Twvw_1woqg1KpXe25CGcKr-AvOk7Rrm-a6Ru2_wbFsN3KGIgMyOUKaZcsSj9u9dYlQScS1lW7UpL_NkRyo37RrbwnAXnr4r8Mca-ItCKNdFJLm6vYynxxNcr9nlcV18Jj0toYh8tlVvzgdKSpNp9oTE5It8yina7W3D48jz327JFoY1jHYmev6yrE6X_"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"
+            ></div>
+            <div
+              class="absolute top-4 right-4 bg-zinc-800 text-zinc-400 font-label text-[9px] px-2 py-1 font-bold tracking-widest uppercase"
+            >
+              Concluded
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-2">
+              <span
+                class="font-label text-[10px] text-secondary tracking-widest uppercase"
+                >Political Theory</span
+              >
+              <span class="font-label text-[10px] text-zinc-500">2h ago</span>
+            </div>
+            <h3 class="font-headline text-xl mb-4 leading-none">
+              Modern Power: Machiavelli vs. Hobbes
+            </h3>
+            <p
+              class="text-on-surface-variant text-sm line-clamp-2 font-body mb-6"
+            >
+              The Prince meets Leviathan. An examination of statecraft and the
+              social contract in a post-globalization landscape.
+            </p>
+            <div
+              class="flex justify-between items-center border-t border-outline-variant/10 pt-4"
+            >
+              <div class="flex -space-x-2">
+                <div
+                  class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-800 flex items-center justify-center text-[10px] font-headline"
+                >
+                  M
+                </div>
+                <div
+                  class="w-8 h-8 rounded-full border-2 border-surface-container bg-zinc-700 flex items-center justify-center text-[10px] font-headline"
+                >
+                  H
+                </div>
+              </div>
+              <button
+                class="text-zinc-400 font-label text-[10px] uppercase tracking-widest flex items-center gap-2"
+              >
+                Read Transcript
+                <span class="material-symbols-outlined text-xs"
+                  >history_edu</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- BottomNavBar -->
+    <nav
+      class="fixed bottom-0 left-0 w-full h-20 bg-[#0e0e10]/80 backdrop-blur-xl border-t border-[#27272A] flex justify-around items-center px-4 pb-4 z-50"
+    >
+      <!-- Hub (Active) -->
+      <a
+        class="flex flex-col items-center justify-center text-[#00FFA3] drop-shadow-[0_0_8px_rgba(0,255,163,0.3)] active:scale-90 transition-all"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >grid_view</span
+        >
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Hub</span
+        >
+      </a>
+      <!-- Archive -->
+      <a
+        class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined">history_edu</span>
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Archive</span
+        >
+      </a>
+      <!-- Settings -->
+      <a
+        class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined">settings</span>
+        <span
+          class="font-['JetBrains_Mono'] text-[10px] uppercase tracking-widest mt-1"
+          >Settings</span
+        >
+      </a>
+    </nav>
+  </body>
+</html>
